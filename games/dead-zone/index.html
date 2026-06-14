@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dead Zone — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Dark Vignette Overlay -->
+    <div class="vignette"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="health-container">
+            <div class="health-label">HP:</div>
+            <div class="health-bar-bg">
+              <div id="health-bar-fill"></div>
+            </div>
+          </div>
+          <div class="hud-item" style="font-size:0.8rem; color:#888;">
+            WEAPON: <span style="color:#eee; text-shadow:none;">PISTOL</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item">WAVE: <span id="hud-wave">1</span></div>
+          <div class="hud-item">AMMO: <span id="hud-ammo">30 / 30</span></div>
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Center Announcements -->
+    <div id="announcement">WAVE 1</div>
+    <div id="reload-indicator">RELOADING...</div>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">DEAD ZONE</h1>
+      <p>A top-down tactical zombie survival game controlled by your movements.</p>
+      
+      <div class="control-expl">
+        <div style="font-weight:bold; font-size:0.85rem; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px; text-transform:uppercase;">Controls</div>
+        <div><span>SAY "WALK" / "STOP"</span> - Walk forward or halt character</div>
+        <div><span>LEAN LEFT / RIGHT</span> - Strafe/slide sideways</div>
+        <div><span>PINCH FINGERS (Thumb + Index)</span> - Fire weapon</div>
+        <div><span>OPEN HAND WIDE / SAY "RELOAD"</span> - Reload weapon</div>
+        <div><span>MOUSE POSITION</span> - Aim weapon crosshair</div>
+        <div style="margin-top:10px; color:#555; font-size:0.7rem;">Fallback: WASD / Arrow Keys to move, Left Click to shoot, R to reload.</div>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Survivors</div>
+        <div id="lobby-leaderboard">
+          <div class="leaderboard-row"><span class="rank">1.</span> <span class="score">00000</span></div>
+        </div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn" style="border-color:#c0392b; margin-top:10px;">Enable Camera & Play</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Sensor Calibration</h2>
+              <p>Configure the camera and gesture sensors before you begin.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Grant Camera Permissions</div>
+                  <div class="step-desc">Click "Enable" to authorize your webcam stream.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary" style="padding: 6px 15px; font-size:0.75rem;">Enable</button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Stand Still (Calibration)</div>
+                  <div class="step-desc">Stand back 5-7 ft and remain still to calibrate noise levels.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Voice Walking</div>
+                  <div class="step-desc">Say "WALK" or "FORWARD" to move, and "STOP" to stand still.</div>
+                  <div id="cal-speech-transcript" class="speech-transcript-preview" style="color: #27ae60; font-size:0.75rem; margin-top: 5px; font-family: monospace; text-transform: uppercase;">Heard: "-"</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">3</div>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div id="step-4" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">4. Lean Left & Right</div>
+                  <div class="step-desc">Lean shoulders left, then lean shoulders right to test strafe detection.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-4-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">4</div>
+                </div>
+              </div>
+
+              <!-- Step 5 -->
+              <div id="step-5" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">5. Finger Gestures</div>
+                  <div class="step-desc">Pinch (Thumb+Index) to test Shoot, then Open Hand wide to test Reload.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-5-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">5</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Motion Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">WALKING</span>
+                <span id="stat-walk" class="status-value val-false">NO</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">LEAN</span>
+                <span id="stat-lean" class="status-value val-center">CENTER</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">GESTURE</span>
+                <span id="stat-gesture" class="status-value val-none">NONE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>Start Survival</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1>SYSTEM COMPROMISED</h1>
+      <p>You have been consumed by the horde.</p>
+      
+      <div>
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color:#888;">WAVE SURVIVED: <span id="go-wave" style="color:#eee;">1</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Survivors</div>
+        <div id="gameover-leaderboard">
+          <!-- Rows dynamic -->
+        </div>
+      </div>
+
+      <button id="btn-restart" class="btn" style="border-color:#c0392b; margin-top: 15px;">Respawn</button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="direction-indicators">
+        <span id="ind-left" class="dir-indicator">◀ L</span>
+        <span id="ind-walk" class="dir-indicator">▲ WALK</span>
+        <span id="ind-right" class="dir-indicator">R ▶</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Gemini Status:</span><span id="dbg-gemini" class="debug-val">disconnected</span></div>
+      <div class="debug-row"><span>Gemini Walk:</span><span id="dbg-ai-walk" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Flow Motion:</span><span id="dbg-flow-motion" class="debug-val">0.00 / 0.00</span></div>
+      <div class="debug-row"><span>Flow Lean Ind:</span><span id="dbg-flow-lean" class="debug-val">0.00 (center)</span></div>
+      <div class="debug-row"><span>Pinch Dist:</span><span id="dbg-pinch" class="debug-val">1.00</span></div>
+      <div class="debug-row"><span>Active Lean:</span><span id="dbg-lean" class="debug-val">center</span></div>
+      <div class="debug-row"><span>Walking Out:</span><span id="dbg-walk" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Voice Cmd:</span><span id="dbg-voice-cmd" class="debug-val">none</span></div>
+      <div class="debug-row"><span>Voice Heard:</span><span id="dbg-voice-heard" class="debug-val">""</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic Engine -->
+  <script src="game.js"></script>
+</body>
+</html>

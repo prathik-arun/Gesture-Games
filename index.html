@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesture Zone — Play with your body</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Nav -->
+  <header>
+    <div class="container">
+      <div class="logo">
+        GESTURE <span>ZONE</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#hero" class="active">Home</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#lobby">Games</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <h1>GESTURE ZONE</h1>
+    <p>Play with your body. No keyboard. No controllers. Just you.</p>
+    <a href="#lobby" class="btn">Enter Games Lobby</a>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="features">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-num">01</div>
+          <h3>Enable Camera</h3>
+          <p>Grant webcam access when launching a game. The server processes frames securely, and your API keys never touch the client.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">02</div>
+          <h3>Stand Back</h3>
+          <p>Move back 5-7 feet from your screen so the camera sees your upper body and legs. Make sure your play area is well lit.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">03</div>
+          <h3>Control with Gestures</h3>
+          <p>Say "walk" or "go" to move forward, and "stop" to stand still. Lean left/right to slide, and pinch your fingers to shoot or reload verbally / physically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Games Lobby Section -->
+  <section id="lobby" class="lobby">
+    <div class="container">
+      <h2 class="section-title">Games Lobby</h2>
+      <div class="lobby-grid">
+        <!-- Dead Zone (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge">LIVE</span>
+            <div class="game-icon">☣</div>
+          </div>
+          <div class="game-content">
+            <h3>Dead Zone</h3>
+            <div class="game-meta">Zombie Survival | Action</div>
+            <p>Survive endless waves of the undead. Say "walk" or "go" to walk, "stop" to halt, lean left/right to strafe, and pinch your fingers to shoot.</p>
+            <a href="games/dead-zone/index.html" class="btn">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Gesture Ninja (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge">LIVE</span>
+            <div class="game-icon">🥷</div>
+          </div>
+          <div class="game-content">
+            <h3>Gesture Ninja</h3>
+            <div class="game-meta">Slicing | Action</div>
+            <p>Slice flying fruits using your hands! Enable your webcam to track your hand movements in real-time, slash fruits, trigger combos, and avoid bombs.</p>
+            <a href="games/gesture-ninja/index.html" class="btn">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Flappy Mouth (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge">LIVE</span>
+            <div class="game-icon">🐦</div>
+          </div>
+          <div class="game-content">
+            <h3>Flappy Mouth</h3>
+            <div class="game-meta">Facial Tracking | Arcade</div>
+            <p>Control a neon bird with your mouth! Open your mouth to rise, and close it to glide down. Navigate through retro obstacles and beat high scores.</p>
+            <a href="games/flappy-mouth/index.html" class="btn">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Gesture Snake (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge" style="background:#00ff88; color:#020202; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);">LIVE</span>
+            <div class="game-icon" style="color:#00ff88; text-shadow:0 0 10px rgba(0, 255, 136, 0.4)">🐍</div>
+          </div>
+          <div class="game-content">
+            <h3>Gesture Snake</h3>
+            <div class="game-meta">Dual Inputs | Grid Arcade</div>
+            <p>Steer a cyber-snake in 4 directions by pointing your finger or calling out commands ("Up", "Down", "Left", "Right"). Dual controls combine for maximum agility!</p>
+            <a href="games/gesture-snake/index.html" class="btn" style="border-color:#00ff88;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Cyber Breaker (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge" style="background:#00e5ff; color:#020202; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);">LIVE</span>
+            <div class="game-icon" style="color:#00e5ff; text-shadow:0 0 10px rgba(0, 229, 255, 0.4)">🧱</div>
+          </div>
+          <div class="game-content">
+            <h3>Cyber Breaker</h3>
+            <div class="game-meta">Hand Tracking | Arcade</div>
+            <p>Control a cyber-paddle at the bottom of the screen using hand tracking. Bounce the energy ball to smash rows of glowing retro neon bricks!</p>
+            <a href="games/cyber-breaker/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Neon Keepy-Uppy (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge" style="background:#ff00ff; color:#020202; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);">LIVE</span>
+            <div class="game-icon" style="color:#ff00ff; text-shadow:0 0 10px rgba(255, 0, 255, 0.4)">🎈</div>
+          </div>
+          <div class="game-content">
+            <h3>Neon Keepy-Uppy</h3>
+            <div class="game-meta">Face & Hand Tracking | Physics</div>
+            <p>Keep the glowing neon balloons in the air! Bounce them off your hands and head, or open your mouth to blow a gust of wind to lift them up.</p>
+            <a href="games/keepy-uppy/index.html" class="btn" style="border-color:#ff00ff;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Dodge Runner (COMING SOON) -->
+        <div class="game-card coming-soon">
+          <div class="game-preview">
+            <span class="badge coming-soon">COMING SOON</span>
+            <div class="game-icon">⚡</div>
+          </div>
+          <div class="game-content">
+            <h3>Dodge Runner</h3>
+            <div class="game-meta">Endless Runner</div>
+            <p>Lean left and right to dodge speeding obstacles. Walk faster in place to speed up and beat your high scores.</p>
+            <a href="#" class="btn" onclick="return false;">Locked</a>
+          </div>
+        </div>
+
+        <!-- Shadow Fighter (LIVE) -->
+        <div class="game-card">
+          <div class="game-preview">
+            <span class="badge" style="background:#ff5500; color:#020202; box-shadow: 0 0 10px rgba(255, 85, 0, 0.3);">LIVE</span>
+            <div class="game-icon" style="color:#ff5500; text-shadow: 0 0 10px rgba(255, 85, 0, 0.4);">✊</div>
+          </div>
+          <div class="game-content">
+            <h3>Shadow Fighter</h3>
+            <div class="game-meta">Boxing | Full-Body Fighting</div>
+            <p>Face off against a physics-driven stitched burlap puppet! Thrust hands to punch, group hands to block, lean to dodge hooks, and shout "Kick!" to blast them back.</p>
+            <a href="games/shadow-fighter/index.html" class="btn" style="border-color:#ff5500;">Play Game</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 GESTURE ZONE. All rights reserved.</p>
+      <p>Powered by Gemini 2.0 Flash Multimodal Live API & MediaPipe Hands.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        if (this.getAttribute('href').startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            // Update active link
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            this.classList.add('active');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

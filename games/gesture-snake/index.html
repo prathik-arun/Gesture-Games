@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesture Snake — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Dark Vignette Overlay -->
+    <div class="vignette"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="hud-item" style="font-size: 0.95rem;">
+            CONTROL: <span id="control-mode-label" style="color:#00ff88; text-shadow: 0 0 5px rgba(0, 255, 136, 0.4);">FINGER / VOICE</span>
+          </div>
+          <div class="hud-item" style="font-size:0.75rem; color:#666; margin-top: 4px;">
+            LAST COMMAND: <span id="last-cmd-label" style="color:#eee; text-shadow:none;">NONE</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+          <div class="hud-item" style="font-size:0.8rem; color:#888;">HIGH: <span id="hud-highscore" style="color:#ff0055;">00000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Center Announcements -->
+    <div id="announcement">READY</div>
+
+    <!-- Background Toggle Button (Floating) -->
+    <button id="btn-toggle-bg" class="control-btn" style="display: none;">Toggle Background (C)</button>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">GESTURE SNAKE</h1>
+      <p>Steer the cyber-snake using finger pointing or vocal commands! Keep it growing, avoid the walls, and survive.</p>
+      
+      <div class="control-expl">
+        <div style="font-weight:bold; font-size:0.85rem; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px; text-transform:uppercase;">Dual-Control Mechanisms</div>
+        <div><span>1. FINGER POINTING 👉</span> - Point your index finger Up, Down, Left, or Right. The camera tracks your direction relative to your palm.</div>
+        <div><span>2. VOICE STEERING 🗣️</span> - Say <span>"Up"</span>, <span>"Down"</span>, <span>"Left"</span>, or <span>"Right"</span> aloud. The audio processor steers instantly.</div>
+        <div><span>3. HYBRID MODE</span> - Point or speak at any time. Inputs combine seamlessly.</div>
+        <div style="margin-top:10px; color:#555; font-size:0.7rem;">Fallback: Press Arrow Keys on your keyboard. Press 'C' to toggle background view.</div>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Pilots</div>
+        <div id="lobby-leaderboard">
+          <div class="leaderboard-row"><span class="rank">1.</span> <span class="score">00000</span></div>
+        </div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn" style="border-color:#00ff88; margin-top:10px;">Enable Camera & Play</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Navigation Check</h2>
+              <p>Position your camera, calibrate optical flow, and verify dual steering controls.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Enable Webcam</div>
+                  <div class="step-desc">Grant access to configure hand-pointing and voice controls.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary" style="padding: 6px 15px; font-size:0.75rem;">Enable</button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Stand Still (Flow Calib)</div>
+                  <div class="step-desc">Remain steady for 3s to initialize background noise filters.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Steering Inputs</div>
+                  <div class="step-desc">Point your index finger or say "Up/Down/Left/Right" aloud.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-indicator" id="arrow-up-calib">↑</div>
+                  <div class="step-indicator" id="arrow-down-calib">↓</div>
+                  <div class="step-indicator" id="arrow-left-calib">←</div>
+                  <div class="step-indicator" id="arrow-right-calib">→</div>
+                  <div class="step-indicator" id="step-3-indicator">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Motion Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">HAND TRACKER</span>
+                <span id="stat-hand" class="status-value val-false">DISCONNECTED</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">VOICE DETECTOR</span>
+                <span id="stat-voice" class="status-value val-false">DISCONNECTED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>Launch Grid Navigation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1>SNAKE DESYNCED</h1>
+      <p>Your cyber-snake collided with grid boundaries or its own trailing nodes.</p>
+      
+      <div>
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color:#888;">HIGH SCORE: <span id="go-highscore" style="color:#00ff88;">00000</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Pilots</div>
+        <div id="gameover-leaderboard">
+          <!-- Rows dynamic -->
+        </div>
+      </div>
+
+      <button id="btn-restart" class="btn" style="border-color:#00ff88; margin-top: 15px;">Launch Session Again</button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="hand-tracking-light">
+        <span class="indicator-dot" id="ind-sensor-active"></span>
+        <span id="ind-sensor-text" class="dir-indicator">SENSOR IDLE</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Audio Listener:</span><span id="dbg-audio" class="debug-val">disconnected</span></div>
+      <div class="debug-row"><span>Last Words:</span><span id="dbg-words" class="debug-val">none</span></div>
+      <div class="debug-row"><span>Hand Active:</span><span id="dbg-hand" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Pointing Vector:</span><span id="dbg-vector" class="debug-val">0, 0</span></div>
+      <div class="debug-row"><span>Pointing Dir:</span><span id="dbg-point-dir" class="debug-val">none</span></div>
+      <div class="debug-row"><span>Snake Head:</span><span id="dbg-head" class="debug-val">0, 0</span></div>
+      <div class="debug-row"><span>FPS:</span><span id="dbg-fps" class="debug-val">60</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic Engine -->
+  <script src="game.js"></script>
+</body>
+</html>

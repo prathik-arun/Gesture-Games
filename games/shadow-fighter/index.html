@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadow Fighter — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Dark Vignette Overlay -->
+    <div class="vignette"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="shield-container">
+            <span class="hud-label">SHIELD ENERGY:</span>
+            <div class="bar-outer"><div id="shield-fill" class="bar-fill shield-active"></div></div>
+          </div>
+          <div class="hud-item" style="font-size:0.75rem; color:#888; margin-top: 4px;">
+            ACTION: <span id="player-action-label" style="color:#eee; text-shadow:none;">STANCE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-center-combat">
+        <div id="combat-warning">DODGE!</div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel" style="align-items: flex-end;">
+          <div class="health-container">
+            <span class="hud-label">BUDDY HEALTH:</span>
+            <div class="bar-outer"><div id="opponent-fill" class="bar-fill opponent-active"></div></div>
+          </div>
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Center Announcements -->
+    <div id="announcement">READY</div>
+
+    <!-- Background Toggle Button (Floating) -->
+    <button id="btn-toggle-bg" class="control-btn" style="display: none;">Toggle Background (C)</button>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">SHADOW FIGHTER</h1>
+      <p>Face off against a physics-driven sackboy puppet in real-time shadow boxing! Punch, block, and kick to survive!</p>
+      
+      <div class="control-expl">
+        <div style="font-weight:bold; font-size:0.85rem; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px; text-transform:uppercase;">Combat Moves</div>
+        <div><span>PUNCH 🤜</span> - Thrust either hand forward quickly. The velocity triggers a left or right punch.</div>
+        <div><span>BLOCK 🛡️</span> - Hold both hands together close to your head. Creates a defensive force field to block wobbly attacks.</div>
+        <div><span>HEAVY KICK 🦵</span> - Say <span>"Kick"</span> aloud or raise your foot quickly to knock the puppet flying.</div>
+        <div style="margin-top:10px; color:#555; font-size:0.7rem;">Fallback: Press SPACE to punch. Press B to block. Press K to kick.</div>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Fighters</div>
+        <div id="lobby-leaderboard">
+          <div class="leaderboard-row"><span class="rank">1.</span> <span class="score">00000</span></div>
+        </div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn" style="border-color:#ff5500; margin-top:10px;">Enable Camera & Train</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Combat Training</h2>
+              <p>Configure webcam tracking and test your offensive/defensive gestures.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Grant Camera Permissions</div>
+                  <div class="step-desc">Click "Enable" to authorize webcam frames and speech tools.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary" style="padding: 6px 15px; font-size:0.75rem;">Enable</button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Stand Center & Calibrate</div>
+                  <div class="step-desc">Keep your body still for 3s to isolate camera visual noise.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Punch & Block</div>
+                  <div class="step-desc">Thrust a hand fast (Punch) and raise both near your face (Block).</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-indicator" id="ind-calib-punch">PUNCH</div>
+                  <div class="step-indicator" id="ind-calib-block">BLOCK</div>
+                  <div class="step-indicator" id="step-3-indicator">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">HAND CONNECT</span>
+                <span id="stat-hand-signal" class="status-value val-false">DISCONNECTED</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">VOICE DETECT</span>
+                <span id="stat-voice-signal" class="status-value val-false">INACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>Enter Boxing Ring</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1 id="gameover-title">MATCH ENDED</h1>
+      <p id="gameover-message">Buddy out-boxed you in this cycle.</p>
+      
+      <div>
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color:#888;">HIGH SCORE: <span id="go-highscore" style="color:#ff5500;">00000</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Fighters</div>
+        <div id="gameover-leaderboard">
+          <!-- Rows dynamic -->
+        </div>
+      </div>
+
+      <button id="btn-restart" class="btn" style="border-color:#ff5500; margin-top: 15px;">Enter Arena Again</button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="hand-tracking-light">
+        <span class="indicator-dot" id="ind-hand-active"></span>
+        <span id="ind-hand-text" class="dir-indicator">TRACKING IDLE</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Audio State:</span><span id="dbg-audio" class="debug-val">inactive</span></div>
+      <div class="debug-row"><span>Heard Speech:</span><span id="dbg-speech" class="debug-val">none</span></div>
+      <div class="debug-row"><span>Left Hand Speed:</span><span id="dbg-lh-speed" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Right Hand Speed:</span><span id="dbg-rh-speed" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Lean State:</span><span id="dbg-lean" class="debug-val">center</span></div>
+      <div class="debug-row"><span>Current Action:</span><span id="dbg-action" class="debug-val">stance</span></div>
+      <div class="debug-row"><span>FPS:</span><span id="dbg-fps" class="debug-val">60</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic Engine -->
+  <script src="game.js"></script>
+</body>
+</html>

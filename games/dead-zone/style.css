@@ -1,0 +1,672 @@
+/* Dead Zone Game Specific CSS */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #030303;
+  color: #eeeeee;
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  user-select: none;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gritty Vignette overlay */
+.vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.95), inset 0 0 200px rgba(192, 57, 43, 0.15);
+  pointer-events: none;
+  z-index: 10;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #050505;
+}
+
+/* Return Button */
+.back-to-lobby {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #888;
+  padding: 8px 15px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 50;
+  transition: all 0.3s ease;
+}
+
+.back-to-lobby:hover {
+  border-color: #c0392b;
+  color: #eee;
+  box-shadow: 0 0 10px rgba(192, 57, 43, 0.4);
+}
+
+/* HUD Overlay */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.hud-panel {
+  background: rgba(8, 8, 8, 0.85);
+  border: 1px solid #1a1a1a;
+  padding: 15px 25px;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.health-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.health-label {
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.health-bar-bg {
+  width: 200px;
+  height: 14px;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+#health-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #27ae60;
+  transition: width 0.2s ease, background-color 0.3s ease;
+}
+
+.hud-right {
+  text-align: right;
+}
+
+.hud-item {
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.hud-item span {
+  color: #c0392b;
+  text-shadow: 0 0 5px rgba(192, 57, 43, 0.5);
+}
+
+/* Center HUD Notifications */
+#announcement {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 3rem;
+  letter-spacing: 8px;
+  font-weight: bold;
+  color: #c0392b;
+  text-shadow: 0 0 20px rgba(192, 57, 43, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 20;
+  text-transform: uppercase;
+}
+
+#reload-indicator {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  font-weight: bold;
+  color: #f39c12;
+  text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+}
+
+/* Onboarding Calibration Panel */
+#calibration-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(4, 4, 4, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.calibration-box {
+  width: 95%;
+  max-width: 980px;
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 0 35px rgba(192, 57, 43, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calibration-content-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .calibration-content-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calibration-steps-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.calibration-camera-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: #060606;
+  border: 1px solid #151515;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.camera-wrapper {
+  position: relative;
+  width: 320px;
+  height: 240px;
+  background: #000;
+  border: 1px solid #222;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+#webcam-calibration-view {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror */
+}
+
+#calibration-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.motion-status-display {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.status-indicator-box {
+  flex: 1;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  padding: 8px 5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-label {
+  font-size: 0.65rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-value {
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.status-value.val-false {
+  color: #555;
+}
+
+.status-value.val-true {
+  color: #27ae60;
+  text-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+}
+
+.status-value.val-center {
+  color: #888;
+}
+
+.status-value.val-left {
+  color: #c0392b;
+  text-shadow: 0 0 5px rgba(192, 57, 43, 0.5);
+}
+
+.status-value.val-right {
+  color: #3498db;
+  text-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.status-value.val-none {
+  color: #555;
+}
+
+.status-value.val-pinch {
+  color: #f39c12;
+  text-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+}
+
+.status-value.val-open {
+  color: #27ae60;
+  text-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+}
+
+.calibration-header {
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.calibration-header h2 {
+  font-size: 1.8rem;
+  letter-spacing: 4px;
+  margin-bottom: 5px;
+  color: #eee;
+}
+
+.calibration-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #1a1a1a;
+  background: #090909;
+  padding: 15px 20px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.step-item.active {
+  border-color: #3498db;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.1);
+}
+
+.step-item.completed {
+  border-color: #27ae60;
+  background: rgba(39, 174, 96, 0.02);
+}
+
+.step-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.step-name {
+  font-size: 0.95rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.step-desc {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.step-item.active .step-desc {
+  color: #888;
+}
+
+.step-item.completed .step-name {
+  color: #27ae60;
+}
+
+.step-status {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.step-indicator {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #222;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.step-item.active .step-indicator {
+  border-color: #3498db;
+  color: #3498db;
+  animation: pulse-blue 1.5s infinite alternate;
+}
+
+.step-item.completed .step-indicator {
+  border-color: #27ae60;
+  background: #27ae60;
+  color: #030303;
+}
+
+.step-progress-bar {
+  width: 80px;
+  height: 4px;
+  background: #111;
+  border-radius: 2px;
+  overflow: hidden;
+  display: none;
+}
+
+.step-item.active .step-progress-bar {
+  display: block;
+}
+
+.step-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #3498db;
+  transition: width 0.1s linear;
+}
+
+.calibration-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-start-game {
+  width: 100%;
+  max-width: 300px;
+  font-weight: bold;
+  animation: glow-red-pulse 2s infinite alternate;
+  border-color: #c0392b;
+}
+
+.btn-start-game:disabled {
+  border-color: #333;
+  color: #555;
+  background: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+  animation: none;
+}
+
+/* Mini Camera Preview & Control Indicators (Bottom-Left) */
+#camera-preview-container {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 120px;
+  border: 1px solid #1a1a1a;
+  background: rgba(8, 8, 8, 0.9);
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 30;
+}
+
+#webcam-view {
+  width: 110px;
+  height: 82px;
+  object-fit: cover;
+  background: #111;
+  border: 1px solid #222;
+  transform: scaleX(-1); /* mirror */
+}
+
+.camera-label {
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: #666;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Mini Movement indicators below camera */
+.direction-indicators {
+  display: flex;
+  justify-content: space-around;
+  padding: 2px 0;
+  border-top: 1px solid #1a1a1a;
+}
+
+.dir-indicator {
+  font-size: 0.75rem;
+  color: #333;
+  font-weight: bold;
+}
+
+.dir-indicator.active {
+  color: #c0392b;
+  text-shadow: 0 0 5px rgba(192, 57, 43, 0.8);
+}
+
+/* Debug / Status overlay (Bottom-Right) */
+#debug-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(8, 8, 8, 0.85);
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 0.65rem;
+  color: #555;
+  line-height: 1.4;
+  z-index: 30;
+  pointer-events: none;
+}
+
+#debug-panel .debug-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+#debug-panel .debug-val {
+  color: #888;
+  font-family: monospace;
+}
+
+#debug-panel .debug-header {
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+}
+
+/* Game Over / Start Menu Screen Overlay */
+.screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 80;
+  text-align: center;
+}
+
+.screen-overlay h1 {
+  color: #c0392b;
+  font-size: 4rem;
+  letter-spacing: 12px;
+  text-shadow: 0 0 20px rgba(192, 57, 43, 0.8);
+  margin-bottom: 10px;
+}
+
+.screen-overlay h1.game-title {
+  color: #eee;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.screen-overlay p {
+  color: #666;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  max-width: 500px;
+  line-height: 1.8;
+}
+
+.screen-overlay span.score-val {
+  color: #c0392b;
+  font-size: 2rem;
+  font-weight: bold;
+  display: block;
+  margin: 15px 0;
+  text-shadow: 0 0 8px rgba(192, 57, 43, 0.6);
+}
+
+.control-expl {
+  margin: 20px 0;
+  border: 1px solid #1a1a1a;
+  padding: 15px 25px;
+  background: #080808;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.control-expl div {
+  margin-bottom: 5px;
+}
+
+.control-expl span {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+/* Leaderboard inside overlays */
+.leaderboard-box {
+  width: 250px;
+  margin: 10px 0;
+  text-align: left;
+}
+
+.leaderboard-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #888;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 3px;
+  margin-bottom: 8px;
+}
+
+.leaderboard-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.leaderboard-row.high {
+  color: #eee;
+}
+
+/* Animations */
+@keyframes pulse-blue {
+  0% {
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+  }
+}
+
+@keyframes glow-red-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(192, 57, 43, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(231, 76, 60, 0.8);
+    background: #c0392b;
+  }
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Keepy-Uppy — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Dark Vignette Overlay -->
+    <div class="vignette"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="lives-container">
+            <span class="hud-label">LIVES:</span>
+            <span id="lives-display" style="color: #e74c3c;">❤️❤️❤️</span>
+          </div>
+          <div class="hud-item" style="font-size:0.8rem; color:#888; margin-top: 4px;">
+            BG OVERLAY: <span id="bg-mode-label" style="color:#eee; text-shadow:none;">CYBER CITY</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+          <div class="hud-item" style="font-size:0.8rem; color:#888;">HIGH: <span id="hud-highscore" style="color:#f39c12;">00000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Center Announcements (Get Ready, Waves, etc) -->
+    <div id="announcement">READY</div>
+
+    <!-- Background Toggle Button (Floating) -->
+    <button id="btn-toggle-bg" class="control-btn" style="display: none;">Toggle Background (C)</button>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">NEON KEEPY-UPPY</h1>
+      <p>Bounce glowing helium balloons off your head and hands, or blow them up with mouth wind! No keyboards. No controllers.</p>
+      
+      <div class="control-expl">
+        <div style="font-weight:bold; font-size:0.85rem; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px; text-transform:uppercase;">How to Play</div>
+        <div><span>HEAD BOUNCE 🤕</span> - Move your head near balloons to bounce them back up.</div>
+        <div><span>HAND SHIELD 🖐️</span> - Wave your hands to slap balloons in the air.</div>
+        <div><span>MOUTH WIND 🌬️</span> - Open mouth wide to blow an upward gust of wind.</div>
+        <div><span>LIVES 💔</span> - Lose a heart if any balloon touches the laser floor. Spawns more balloons as score rises!</div>
+        <div style="margin-top:10px; color:#555; font-size:0.7rem;">Fallback: Move cursor to position safety paddle. Spacebar/Click to blast wind. 'C' toggles background.</div>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Keepers</div>
+        <div id="lobby-leaderboard">
+          <div class="leaderboard-row"><span class="rank">1.</span> <span class="score">00000</span></div>
+        </div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn" style="border-color:#ff00ff; margin-top:10px;">Enable Camera & Play</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Webcam Calibration</h2>
+              <p>Position your camera and verify sensors before starting the game.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Grant Camera Permissions</div>
+                  <div class="step-desc">Click "Enable" to authorize your webcam stream.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary" style="padding: 6px 15px; font-size:0.75rem; border-color:#ff00ff; color:#ff00ff;">Enable</button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Center Your Face</div>
+                  <div class="step-desc">Sit in front of your screen. Stay still to calibrate noise levels.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Mouth Wind & Hands</div>
+                  <div class="step-desc">Open mouth wide or raise hand to complete verification.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Motion Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">AI SENSORS</span>
+                <span id="stat-ai-connected" class="status-value val-false">DISCONNECTED</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">WIND TRIGGER</span>
+                <span id="stat-mouth" class="status-value val-false">NO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>Start Keeping</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1>BALLOON DEFLATED</h1>
+      <p>The balloons touched the laser grid. Gravity wins.</p>
+      
+      <div>
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color:#888;">HIGH SCORE: <span id="go-highscore" style="color:#ff00ff;">00000</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Top Keepers</div>
+        <div id="gameover-leaderboard">
+          <!-- Rows dynamic -->
+        </div>
+      </div>
+
+      <button id="btn-restart" class="btn" style="border-color:#ff00ff; margin-top: 15px;">Restart Game</button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="hand-tracking-light">
+        <span class="indicator-dot" id="ind-mouth-active"></span>
+        <span id="ind-mouth-text" class="dir-indicator">SENSOR IDLE</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Local AI:</span><span id="dbg-gemini" class="debug-val">disconnected</span></div>
+      <div class="debug-row"><span>Wind Level:</span><span id="dbg-mouth-state" class="debug-val">0.0</span></div>
+      <div class="debug-row"><span>Hands Count:</span><span id="dbg-hands-count" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Balloons Active:</span><span id="dbg-balloons" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Score:</span><span id="dbg-score" class="debug-val">0</span></div>
+      <div class="debug-row"><span>FPS:</span><span id="dbg-fps" class="debug-val">60</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic Engine -->
+  <script src="game.js"></script>
+</body>
+</html>
