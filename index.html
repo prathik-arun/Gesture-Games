@@ -3,201 +3,865 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gesture Zone — Play with your body</title>
+  <title>Gesture Zone — Join the Waitlist</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Developer Bypass Gate -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('clear') === 'true') {
+        localStorage.removeItem('preview_access');
+        // Clean URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (urlParams.get('preview') === 'gesture_dev') {
+        localStorage.setItem('preview_access', 'gesture_dev');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+      if (localStorage.getItem('preview_access') === 'gesture_dev') {
+        window.location.href = 'lobby.html';
+      }
+    })();
+  </script>
+
+  <style>
+    /* Custom Waitlist Page Layout styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Courier Prime', monospace;
+      background-color: #080808;
+    }
+
+    #canvas-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .waitlist-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 15px;
+      box-sizing: border-box;
+      background: transparent;
+      overflow-y: auto;
+    }
+
+    .waitlist-card {
+      background: rgba(13, 13, 13, 0.85);
+      border: 1px solid rgba(192, 57, 43, 0.3);
+      box-shadow: 0 0 30px rgba(192, 57, 43, 0.15), inset 0 0 15px rgba(192, 57, 43, 0.05);
+      border-radius: 12px;
+      padding: 3rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .waitlist-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(192, 57, 43, 0.5), transparent 40%, transparent 60%, rgba(192, 57, 43, 0.5));
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .waitlist-card:hover {
+      border-color: rgba(231, 76, 60, 0.6);
+      box-shadow: 0 0 40px rgba(192, 57, 43, 0.25), inset 0 0 20px rgba(192, 57, 43, 0.1);
+    }
+
+    .logo-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .waitlist-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      letter-spacing: 6px;
+      color: #eee;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .waitlist-logo span {
+      color: var(--primary-accent);
+      text-shadow: 0 0 12px var(--primary-accent);
+    }
+
+    .waitlist-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 4px;
+      color: #eee;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .waitlist-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      text-transform: none;
+    }
+
+    /* Odometer Counter Styles */
+    .counter-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .counter-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .digits-container {
+      display: inline-flex;
+      gap: 6px;
+      background: rgba(5, 5, 5, 0.6);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .digit-box {
+      width: 42px;
+      height: 56px;
+      background: rgba(18, 18, 18, 0.95);
+      border: 1px solid rgba(192, 57, 43, 0.4);
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      color: #e74c3c;
+      text-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+      box-shadow: inset 0 0 8px rgba(192, 57, 43, 0.2);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .digit-box::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Form Styles */
+    .waitlist-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 1rem;
+    }
+
+    .waitlist-input {
+      background: rgba(15, 15, 15, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      text-align: center;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .waitlist-input:focus {
+      outline: none;
+      border-color: var(--secondary-accent);
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+      background: rgba(22, 22, 22, 0.9);
+    }
+
+    .waitlist-input::placeholder {
+      color: #444;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--primary-accent);
+      color: var(--text-primary);
+      padding: 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-accent);
+      box-shadow: var(--glow-shadow);
+      transform: translateY(-2px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .feedback-msg {
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .feedback-msg.success {
+      display: block;
+      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.08);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .feedback-msg.error {
+      display: block;
+      color: #e74c3c;
+      background: rgba(231, 76, 60, 0.08);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    /* Success Ticket Styles */
+    .success-ticket {
+      border: 1px dashed rgba(46, 204, 113, 0.5);
+      background: rgba(46, 204, 113, 0.04);
+      padding: 1.8rem;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      box-shadow: 0 0 20px rgba(46, 204, 113, 0.08), inset 0 0 10px rgba(46, 204, 113, 0.02);
+      animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    .ticket-header {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      color: #2ecc71;
+      letter-spacing: 3px;
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+    }
+    
+    .ticket-badge {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    
+    .ticket-number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #2ecc71;
+      letter-spacing: 5px;
+      text-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+      margin-bottom: 1.2rem;
+    }
+    
+    .ticket-info {
+      font-size: 0.85rem;
+      color: #bbb;
+      line-height: 1.6;
+      text-transform: none;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Diagnostics HUD footer */
+    .diagnostics-hud {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.6;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+
+    .diagnostics-hud span {
+      color: #7f8c8d;
+    }
+
+    .system-status {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(10, 10, 10, 0.6);
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .system-status:hover {
+      border-color: rgba(192, 57, 43, 0.3);
+      color: #eee;
+      box-shadow: 0 0 8px rgba(192, 57, 43, 0.2);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #2ecc71;
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 6px #2ecc71;
+      animation: blink 2s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    /* Mobile Responsive Media Query */
+    @media (max-width: 480px) {
+      .waitlist-wrapper {
+        padding: 30px 12px;
+      }
+
+      .waitlist-card {
+        padding: 2.2rem 1.25rem;
+      }
+      
+      .waitlist-logo {
+        font-size: 1.75rem;
+        letter-spacing: 4px;
+      }
+      
+      .waitlist-title {
+        font-size: 1.05rem;
+        letter-spacing: 3px;
+        margin-bottom: 1.2rem;
+      }
+      
+      .waitlist-desc {
+        font-size: 0.8rem;
+        margin-bottom: 1.8rem;
+        line-height: 1.5;
+      }
+      
+      .digits-container {
+        padding: 8px 10px;
+      }
+
+      .digit-box {
+        width: 32px;
+        height: 44px;
+        font-size: 1.35rem;
+      }
+      
+      .counter-section {
+        margin-bottom: 1.8rem;
+      }
+      
+      .waitlist-input {
+        padding: 12px;
+        font-size: 0.85rem;
+      }
+
+      .btn-submit {
+        padding: 12px;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+      }
+
+      .success-ticket {
+        padding: 1.2rem;
+      }
+
+      .ticket-number {
+        font-size: 2.1rem;
+      }
+
+      .ticket-info {
+        font-size: 0.8rem;
+      }
+
+      /* Re-position absolute panels statically to sit cleanly under the card on mobile */
+      .diagnostics-hud {
+        position: static;
+        margin-top: 25px;
+        text-align: center;
+        font-size: 0.65rem;
+      }
+      
+      .system-status {
+        position: static;
+        margin-top: 15px;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Header / Nav -->
-  <header>
-    <div class="container">
-      <div class="logo">
-        GESTURE <span>ZONE</span>
+  
+  <!-- Interactive Canvas Particles Background -->
+  <canvas id="canvas-bg"></canvas>
+
+  <div class="waitlist-wrapper">
+    <div class="waitlist-card">
+      <div class="logo-container">
+        <div class="waitlist-logo">GESTURE <span>ZONE</span></div>
       </div>
-      <nav>
-        <ul>
-          <li><a href="#hero" class="active">Home</a></li>
-          <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#lobby">Games</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+      
+      <div class="waitlist-title">OPERATIVE PROTOCOL</div>
+      <p class="waitlist-desc">
+        A new era of gesture-controlled gaming is building. Connect your camera, play directly in the browser, and compete with friends. We will open-source the engine tool, enabling creators to build their own custom gesture games and upload them directly to our platform. Sign up for early deployment access.
+      </p>
 
-  <!-- Hero Section -->
-  <section id="hero" class="hero">
-    <h1>GESTURE ZONE</h1>
-    <p>Play with your body. No keyboard. No controllers. Just you.</p>
-    <a href="#lobby" class="btn">Enter Games Lobby</a>
-  </section>
-
-  <!-- How It Works Section -->
-  <section id="how-it-works" class="features">
-    <div class="container">
-      <h2 class="section-title">How It Works</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-num">01</div>
-          <h3>Enable Camera</h3>
-          <p>Grant webcam access when launching a game. The server processes frames securely, and your API keys never touch the client.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-num">02</div>
-          <h3>Stand Back</h3>
-          <p>Move back 5-7 feet from your screen so the camera sees your upper body and legs. Make sure your play area is well lit.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-num">03</div>
-          <h3>Control with Gestures</h3>
-          <p>Say "walk" or "go" to move forward, and "stop" to stand still. Lean left/right to slide, and pinch your fingers to shoot or reload verbally / physically.</p>
+      <!-- Live Counter Section -->
+      <div class="counter-section">
+        <div class="counter-label">Operators Standing By</div>
+        <div class="digits-container" id="digits-container">
+          <div class="digit-box">0</div>
+          <div class="digit-box">0</div>
+          <div class="digit-box">0</div>
+          <div class="digit-box">0</div>
+          <div class="digit-box">0</div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Games Lobby Section -->
-  <section id="lobby" class="lobby">
-    <div class="container">
-      <h2 class="section-title">Games Lobby</h2>
-      <div class="lobby-grid">
-        <!-- Dead Zone (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <div class="game-icon">☣</div>
-          </div>
-          <div class="game-content">
-            <h3>Dead Zone</h3>
-            <div class="game-meta">Zombie Survival | Action</div>
-            <p>Survive endless waves of the undead. Say "walk" or "go" to walk, "stop" to halt, lean left/right to strafe, and pinch your fingers to shoot.</p>
-            <a href="games/dead-zone/index.html" class="btn">Play Game</a>
-          </div>
-        </div>
+      <!-- Join Waitlist Content Area -->
+      <div id="waitlist-content-area">
+        <!-- Join Waitlist Form -->
+        <form id="waitlist-form" class="waitlist-form">
+          <input type="text" id="waitlist-email" class="waitlist-input" placeholder="ENTER YOUR EMAIL" required autocomplete="email" inputmode="email">
+          <button type="submit" class="btn-submit">Join The Waitlist</button>
+        </form>
 
-        <!-- Gesture Ninja (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <div class="game-icon">🥷</div>
-          </div>
-          <div class="game-content">
-            <h3>Gesture Ninja</h3>
-            <div class="game-meta">Slicing | Action</div>
-            <p>Slice flying fruits using your hands! Enable your webcam to track your hand movements in real-time, slash fruits, trigger combos, and avoid bombs.</p>
-            <a href="games/gesture-ninja/index.html" class="btn">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Flappy Mouth (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <div class="game-icon">🐦</div>
-          </div>
-          <div class="game-content">
-            <h3>Flappy Mouth</h3>
-            <div class="game-meta">Facial Tracking | Arcade</div>
-            <p>Control a neon bird with your mouth! Open your mouth to rise, and close it to glide down. Navigate through retro obstacles and beat high scores.</p>
-            <a href="games/flappy-mouth/index.html" class="btn">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Gesture Snake (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge" style="background:#00ff88; color:#020202; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#00ff88; text-shadow:0 0 10px rgba(0, 255, 136, 0.4)">🐍</div>
-          </div>
-          <div class="game-content">
-            <h3>Gesture Snake</h3>
-            <div class="game-meta">Dual Inputs | Grid Arcade</div>
-            <p>Steer a cyber-snake in 4 directions by pointing your finger or calling out commands ("Up", "Down", "Left", "Right"). Dual controls combine for maximum agility!</p>
-            <a href="games/gesture-snake/index.html" class="btn" style="border-color:#00ff88;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Cyber Breaker (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge" style="background:#00e5ff; color:#020202; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#00e5ff; text-shadow:0 0 10px rgba(0, 229, 255, 0.4)">🧱</div>
-          </div>
-          <div class="game-content">
-            <h3>Cyber Breaker</h3>
-            <div class="game-meta">Hand Tracking | Arcade</div>
-            <p>Control a cyber-paddle at the bottom of the screen using hand tracking. Bounce the energy ball to smash rows of glowing retro neon bricks!</p>
-            <a href="games/cyber-breaker/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Neon Keepy-Uppy (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge" style="background:#ff00ff; color:#020202; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff00ff; text-shadow:0 0 10px rgba(255, 0, 255, 0.4)">🎈</div>
-          </div>
-          <div class="game-content">
-            <h3>Neon Keepy-Uppy</h3>
-            <div class="game-meta">Face & Hand Tracking | Physics</div>
-            <p>Keep the glowing neon balloons in the air! Bounce them off your hands and head, or open your mouth to blow a gust of wind to lift them up.</p>
-            <a href="games/keepy-uppy/index.html" class="btn" style="border-color:#ff00ff;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Dodge Runner (COMING SOON) -->
-        <div class="game-card coming-soon">
-          <div class="game-preview">
-            <span class="badge coming-soon">COMING SOON</span>
-            <div class="game-icon">⚡</div>
-          </div>
-          <div class="game-content">
-            <h3>Dodge Runner</h3>
-            <div class="game-meta">Endless Runner</div>
-            <p>Lean left and right to dodge speeding obstacles. Walk faster in place to speed up and beat your high scores.</p>
-            <a href="#" class="btn" onclick="return false;">Locked</a>
-          </div>
-        </div>
-
-        <!-- Shadow Fighter (LIVE) -->
-        <div class="game-card">
-          <div class="game-preview">
-            <span class="badge" style="background:#ff5500; color:#020202; box-shadow: 0 0 10px rgba(255, 85, 0, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff5500; text-shadow: 0 0 10px rgba(255, 85, 0, 0.4);">✊</div>
-          </div>
-          <div class="game-content">
-            <h3>Shadow Fighter</h3>
-            <div class="game-meta">Boxing | Full-Body Fighting</div>
-            <p>Face off against a physics-driven stitched burlap puppet! Thrust hands to punch, group hands to block, lean to dodge hooks, and shout "Kick!" to blast them back.</p>
-            <a href="games/shadow-fighter/index.html" class="btn" style="border-color:#ff5500;">Play Game</a>
-          </div>
-        </div>
+        <!-- Feedback Banner -->
+        <div id="feedback-msg" class="feedback-msg"></div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 GESTURE ZONE. All rights reserved.</p>
-      <p>Powered by Gemini 2.0 Flash Multimodal Live API & MediaPipe Hands.</p>
-    </div>
-  </footer>
+  <!-- Bottom Left Diagnostics Panel -->
+  <div class="diagnostics-hud">
+    SYS_REF: <span>GZONE_PROT_2026</span><br>
+    LINK_STATUS: <span>ESTABLISHED</span><br>
+    CODENAME: <span>LIVE_API_NODE</span>
+  </div>
 
+  <!-- Bottom Right Secret Dev Access -->
+  <div class="system-status" id="system-status-btn">
+    <span class="status-dot"></span>SYS_SECURE: ACTIVE
+  </div>
+
+  <!-- Firebase Scripts & Interactive UI Logic -->
+  <script type="module">
+    import { database } from "./firebase-config.js";
+    import { ref, get, set, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // References
+    const waitlistForm = document.getElementById('waitlist-form');
+    const emailInput = document.getElementById('waitlist-email');
+    const feedbackMsg = document.getElementById('feedback-msg');
+    const digitsContainer = document.getElementById('digits-container');
+    const systemStatusBtn = document.getElementById('system-status-btn');
+
+    // Helper: sanitize email for Firebase keys
+    function sanitizeEmailKey(email) {
+      return email.toLowerCase().replace(/@/g, '_at_').replace(/\./g, ',');
+    }
+
+    // Helper: simple email syntax check
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    // --- Developer Bypass Trigger (Secret Click) ---
+    systemStatusBtn.addEventListener('click', () => {
+      const code = prompt("Enter developer passcode to access preview:");
+      if (code === 'gesture_dev') {
+        localStorage.setItem('preview_access', 'gesture_dev');
+        window.location.href = 'lobby.html';
+      } else {
+        alert("ACCESS DENIED: INVALID SECURITY PROTOCOL");
+      }
+    });
+
+    // --- Odometer Digital Counter Animation ---
+    let displayedCount = 0;
+
+    function renderDigits(value) {
+      const str = String(value).padStart(5, '0');
+      digitsContainer.innerHTML = '';
+      for (const char of str) {
+        const box = document.createElement('div');
+        box.className = 'digit-box';
+        box.textContent = char;
+        digitsContainer.appendChild(box);
+      }
+    }
+
+    function animateCounter(targetValue) {
+      if (targetValue === displayedCount) return;
+      
+      const duration = 1500; // ms
+      const startTime = performance.now();
+      const startValue = displayedCount;
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // easeOutExpo
+        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const currentValue = Math.floor(startValue + (targetValue - startValue) * ease);
+        
+        renderDigits(currentValue);
+        displayedCount = currentValue;
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          renderDigits(targetValue);
+          displayedCount = targetValue;
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Listen to Waitlist Count Node
+    const countRef = ref(database, 'waitlist/count');
+    onValue(countRef, (snapshot) => {
+      const count = snapshot.val() || 0;
+      animateCounter(count);
+    });
+
+    // --- Handle Waitlist Submission ---
+    waitlistForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      
+      // Developer passcode bypass via input
+      if (email.toLowerCase() === 'gesture_dev') {
+        localStorage.setItem('preview_access', 'gesture_dev');
+        window.location.href = 'lobby.html';
+        return;
+      }
+      
+      feedbackMsg.className = 'feedback-msg'; // Reset
+      feedbackMsg.style.display = 'none';
+
+      if (!validateEmail(email)) {
+        feedbackMsg.textContent = "Please enter a valid security email key.";
+        feedbackMsg.classList.add('error');
+        return;
+      }
+
+      // Check key duplicate
+      const sanitizedKey = sanitizeEmailKey(email);
+      const emailRef = ref(database, `waitlist/emails/${sanitizedKey}`);
+
+      try {
+        const snapshot = await get(emailRef);
+        if (snapshot.exists()) {
+          // Already in waitlist
+          feedbackMsg.textContent = "This email key is already enrolled in the deployment queue.";
+          feedbackMsg.classList.add('error');
+          return;
+        }
+
+        // Add email to database
+        await set(emailRef, {
+          email: email,
+          timestamp: Date.now()
+        });
+
+        // Increment count transactionally
+        const transactionResult = await runTransaction(countRef, (currentCount) => {
+          return (currentCount || 0) + 1;
+        });
+        const ticketNum = transactionResult.snapshot.val() || 0;
+        const formattedTicket = String(ticketNum).padStart(5, '0');
+
+        // Swap form with a gorgeous success ticket
+        const contentArea = document.getElementById('waitlist-content-area');
+        contentArea.innerHTML = `
+          <div class="success-ticket">
+            <div class="ticket-header">ENROLLMENT COMPLETE</div>
+            <div class="ticket-badge">QUEUE POSITION</div>
+            <div class="ticket-number">#${formattedTicket}</div>
+            <p class="ticket-info">
+              Your security node has been registered. You will be notified automatically at <strong>${email}</strong> when the servers go live.
+            </p>
+            <button onclick="window.location.reload()" class="btn-submit" style="font-size: 0.8rem; padding: 10px;">Enlist Another Email</button>
+          </div>
+        `;
+
+      } catch (err) {
+        console.error(err);
+        feedbackMsg.textContent = "DEPLOYMENT ERROR. System node transaction failed.";
+        feedbackMsg.classList.add('error');
+      }
+    });
+  </script>
+
+  <!-- Interactive Warp Grid Canvas Script -->
   <script>
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('nav a').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        if (this.getAttribute('href').startsWith('#')) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-            // Update active link
-            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-            this.classList.add('active');
+    (function() {
+      const canvas = document.getElementById('canvas-bg');
+      const ctx = canvas.getContext('2d');
+
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const mouse = { x: null, y: null, targetX: null, targetY: null, radius: 180 };
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.targetX = e.clientX;
+        mouse.targetY = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.targetX = null;
+        mouse.targetY = null;
+      });
+
+      // Easing mouse coordinates for fluid, high-end motion
+      function updateMouse() {
+        if (mouse.targetX !== null) {
+          if (mouse.x === null) {
+            mouse.x = mouse.targetX;
+            mouse.y = mouse.targetY;
+          } else {
+            mouse.x += (mouse.targetX - mouse.x) * 0.08;
+            mouse.y += (mouse.targetY - mouse.y) * 0.08;
+          }
+        } else {
+          mouse.x = null;
+          mouse.y = null;
+        }
+      }
+
+      class Particle {
+        constructor() {
+          this.reset();
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.35;
+          this.vy = (Math.random() - 0.5) * 0.35;
+          this.size = Math.random() * 2.2 + 0.8; // larger particles
+          this.pulse = Math.random() * Math.PI;
+          this.pulseSpeed = 0.015 + Math.random() * 0.025; // slightly faster pulse
+        }
+        
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.pulse += this.pulseSpeed;
+          
+          if (this.x < -10 || this.x > width + 10) this.vx *= -1;
+          if (this.y < -10 || this.y > height + 10) this.vy *= -1;
+        }
+        
+        draw() {
+          ctx.beginPath();
+          const size = this.size + Math.sin(this.pulse) * 0.6;
+          ctx.arc(this.x, this.y, Math.max(0.1, size), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(231, 76, 60, ${0.35 + Math.sin(this.pulse) * 0.25})`; // brighter, prominent red dots
+          ctx.fill();
+        }
+      }
+
+      const particles = [];
+      const particleCount = 150; // increased particle count for dense representation
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.fillStyle = '#080808';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw subtle cyber grid
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.012)';
+        ctx.lineWidth = 1;
+        const gridSize = 80;
+        for (let x = 0; x < width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+        for (let y = 0; y < height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        updateMouse();
+        
+        // Warp particles & draw connections
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          
+          // Warp effect (attract particles slightly towards mouse)
+          if (mouse.x !== null) {
+            const dx = particles[i].x - mouse.x;
+            const dy = particles[i].y - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              // Add a gentle warping factor
+              particles[i].x -= (dx / dist) * force * 1.8;
+              particles[i].y -= (dy / dist) * force * 1.8;
+            }
+          }
+          
+          particles[i].draw();
+        }
+        
+        // Draw constellation links
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            
+            if (dist < 130) {
+              let alpha = (130 - dist) / 130 * 0.18;
+              
+              // If mouse is near, make links glow brighter
+              if (mouse.x !== null) {
+                const mDist1 = Math.hypot(particles[i].x - mouse.x, particles[i].y - mouse.y);
+                const mDist2 = Math.hypot(particles[j].x - mouse.x, particles[j].y - mouse.y);
+                if (mDist1 < mouse.radius && mDist2 < mouse.radius) {
+                  alpha = (130 - dist) / 130 * 0.45; // Bright link glow
+                }
+              }
+              
+              ctx.strokeStyle = `rgba(192, 57, 43, ${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+          
+          // Faint interactive line to mouse pointer
+          if (mouse.x !== null) {
+            const dx = particles[i].x - mouse.x;
+            const dy = particles[i].y - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < mouse.radius) {
+              const alpha = (mouse.radius - dist) / mouse.radius * 0.22;
+              ctx.strokeStyle = `rgba(231, 76, 60, ${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.stroke();
+            }
           }
         }
-      });
-    });
+        
+        // Render cybernetic cursor grid/target tracking UI
+        if (mouse.x !== null) {
+          ctx.strokeStyle = 'rgba(231, 76, 60, 0.25)';
+          ctx.lineWidth = 1;
+          
+          // Draw target circle outline
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 14, 0, Math.PI * 2);
+          ctx.stroke();
+          
+          // Draw horizontal & vertical crosshairs
+          ctx.beginPath();
+          ctx.moveTo(mouse.x - 22, mouse.y);
+          ctx.lineTo(mouse.x - 6, mouse.y);
+          ctx.moveTo(mouse.x + 6, mouse.y);
+          ctx.lineTo(mouse.x + 22, mouse.y);
+          ctx.moveTo(mouse.x, mouse.y - 22);
+          ctx.lineTo(mouse.x, mouse.y - 6);
+          ctx.moveTo(mouse.x, mouse.y + 6);
+          ctx.lineTo(mouse.x, mouse.y + 22);
+          ctx.stroke();
+          
+          // Core bright dot
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#e74c3c';
+          ctx.fill();
+        }
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
   </script>
 </body>
 </html>

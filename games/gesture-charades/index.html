@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesture Charades — Silent Acting Multiplayer Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header>
+    <div class="logo">
+      GESTURE <span>CHARADES</span>
+    </div>
+    <button class="back-btn" id="btn-back-lobby">← Lobby</button>
+  </header>
+
+  <main>
+    <!-- Screen 1: Setup / Create or Join Room -->
+    <div id="screen-setup" class="game-screen">
+      <div class="lobby-setup">
+        <!-- Join Room Panel -->
+        <div class="setup-panel">
+          <h2>Join Room</h2>
+          <div class="input-group">
+            <label for="nickname-input">Your Nickname</label>
+            <input type="text" id="nickname-input" placeholder="Enter name" maxlength="12" required>
+          </div>
+          <div class="input-group">
+            <label for="room-code-input">Room Code</label>
+            <input type="text" id="room-code-input" placeholder="e.g. 5293" maxlength="6">
+          </div>
+          <button id="btn-join-room" class="btn">Join Room</button>
+        </div>
+
+        <!-- Create Room Panel (Host Options) -->
+        <div class="setup-panel">
+          <h2>Create Private Room</h2>
+          <div class="input-group">
+            <label for="host-nickname">Your Nickname</label>
+            <input type="text" id="host-nickname" placeholder="Enter name" maxlength="12" required>
+          </div>
+          <div class="input-group">
+            <label for="select-rounds">Rounds</label>
+            <select id="select-rounds">
+              <option value="2">2 Rounds</option>
+              <option value="3" selected>3 Rounds</option>
+              <option value="5">5 Rounds</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="select-draw-time">Act Time (seconds)</label>
+            <select id="select-draw-time">
+              <option value="45">45 Seconds</option>
+              <option value="60">60 Seconds</option>
+              <option value="80" selected>80 Seconds</option>
+              <option value="120">120 Seconds</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="select-topic">Select Topic</label>
+            <select id="select-topic">
+              <option value="Animals" selected>Animals</option>
+              <option value="Movies">Movies</option>
+              <option value="Sports">Sports</option>
+              <option value="Random">Random Mix</option>
+              <option value="Custom">Custom AI Topic...</option>
+            </select>
+          </div>
+          <div class="input-group hidden" id="custom-topic-container">
+            <label for="custom-topic-input">Enter Custom Topic</label>
+            <input type="text" id="custom-topic-input" placeholder="e.g. Marvel Superheroes" maxlength="30">
+          </div>
+          <button id="btn-create-room" class="btn btn-secondary">Create Room</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 2: Room Lobby (Waiting for players) -->
+    <div id="screen-lobby" class="game-screen hidden">
+      <div class="room-lobby-panel">
+        <!-- Players in Lobby -->
+        <div class="setup-panel">
+          <h2>Room: <span id="lobby-room-code" style="color: var(--primary-accent); text-shadow: 0 0 5px var(--accent-glow);">----</span></h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Share this code or copy the URL to invite friends.</p>
+          <button id="btn-copy-link" class="btn" style="padding: 6px; font-size: 0.75rem; margin-bottom: 1rem;">Copy Invite Link</button>
+          
+          <div class="player-slot-list" id="lobby-players-list">
+            <!-- Dynamic list of players -->
+            <div style="color: var(--text-muted); text-align: center; padding: 2rem;">Waiting for connections...</div>
+          </div>
+        </div>
+
+        <!-- Room Settings & Ready -->
+        <div class="setup-panel">
+          <h2>Room Settings</h2>
+          <table class="lobby-settings-table">
+            <tr>
+              <td>Rounds:</td>
+              <td><span id="lobby-setting-rounds">--</span></td>
+            </tr>
+            <tr>
+              <td>Act Time:</td>
+              <td><span id="lobby-setting-time">--</span> s</td>
+            </tr>
+            <tr>
+              <td>Topic:</td>
+              <td><span id="lobby-setting-topic" style="color: var(--info);">--</span></td>
+            </tr>
+            <tr>
+              <td>Min Players:</td>
+              <td>2 Players</td>
+            </tr>
+          </table>
+
+          <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+            <div id="lobby-status-msg" style="font-size: 0.8rem; text-align: center; color: var(--warning);">
+              Need at least 2 players to start.
+            </div>
+            <button id="btn-start-game" class="btn btn-secondary" disabled>Start Game</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Game Board -->
+    <div id="screen-game" class="game-screen hidden">
+      <!-- Top Status Indicators -->
+      <div class="top-status-bar">
+        <div class="round-info">ROUND <span id="game-round-num">1/3</span></div>
+        <div class="word-hint-container" id="game-word-hint">_ _ _ _ _</div>
+        <div class="timer-info">TIME: <span id="game-timer">80</span>s</div>
+      </div>
+
+      <!-- Core game grid layout -->
+      <div class="game-grid">
+        <!-- Left Column: Scoreboard -->
+        <div class="panel players-panel">
+          <div class="panel-header">Scoreboard</div>
+          <div class="players-list" id="game-players-list">
+            <!-- Players generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Center Column: Video stream view and overlays -->
+        <div class="panel video-panel">
+          <div class="video-wrapper">
+            <!-- Remote Video Feed (for guessers to see actor) -->
+            <video id="remote-video" class="stream-element" autoplay playsinline></video>
+            
+            <!-- Local Video Feed (for the actor to see themselves) -->
+            <video id="local-video" class="stream-element hidden" autoplay muted playsinline></video>
+
+            <!-- Video Status Indicators / Glassmorphic overlays -->
+            <div class="video-placeholder-overlay" id="video-placeholder">
+              <div class="video-placeholder-icon">🎥</div>
+              <div class="video-placeholder-text">Waiting for the video stream to connect...</div>
+            </div>
+
+            <!-- Overlay 1: Word selection for the actor -->
+            <div class="word-choice-overlay hidden" id="word-choice-panel">
+              <h3 class="glow-text-pulse" style="font-size: 1.5rem;">Choose a Word to Act</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">You have <span id="word-choice-timer" style="color: var(--warning); font-weight: bold;">10</span> seconds...</p>
+              <div class="word-choices" id="word-choices-container">
+                <!-- Word option buttons -->
+              </div>
+            </div>
+
+            <!-- Overlay 2: Word Reveal / Round results -->
+            <div class="game-info-overlay hidden" id="reveal-overlay">
+              <div class="reveal-word-title" id="reveal-title">Round Ended!</div>
+              <div style="font-size: 0.9rem; color: var(--text-muted);">The word was:</div>
+              <div class="reveal-word-val" id="reveal-word">------</div>
+              <div class="overlay-leaderboard" id="reveal-scores-list">
+                <!-- score listings -->
+              </div>
+            </div>
+
+            <!-- Overlay 3: Game Over Leaderboard -->
+            <div class="game-info-overlay hidden" id="gameover-overlay">
+              <h1 class="glow-text-pulse" style="font-size: 2.5rem; color: var(--warning);">Game Completed</h1>
+              <p style="color: var(--text-muted);">Here are the final standings:</p>
+              <div class="overlay-leaderboard" id="gameover-leaderboard-list">
+                <!-- final scores -->
+              </div>
+              <button id="btn-return-lobby" class="btn" style="max-width: 250px; margin-top: 15px;">Return to Lobby</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live chat and guesses -->
+        <div class="panel chat-panel">
+          <div class="panel-header">Guesses & Chat</div>
+          <div class="chat-history" id="game-chat-history">
+            <!-- Messages dynamic -->
+          </div>
+          <div class="chat-input-area">
+            <form id="game-chat-form" autocomplete="off">
+              <input type="text" id="game-chat-input" class="chat-input" placeholder="Type your guess here..." required>
+              <button type="submit" class="back-btn" style="padding: 10px 15px;">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persistent Bottom Camera Panel -->
+    <div class="sensor-panel">
+      <div class="sensor-layout-left">
+        <div class="sensor-controls-guide">
+          <h4>Dumb Charades Camera Stream</h4>
+          <p>If you are the actor, make sure your webcam is enabled so others can see you. You will be automatically muted to prevent making noise.</p>
+        </div>
+      </div>
+
+      <div class="sensor-status">
+        <div class="status-row">
+          <span>Camera Access:</span>
+          <span class="status-val idle" id="sensor-camera-state">Not initialized</span>
+        </div>
+        <div class="status-row">
+          <span>WebRTC Status:</span>
+          <span class="status-val idle" id="sensor-webrtc-state">Disconnected</span>
+        </div>
+      </div>
+      
+      <button id="btn-toggle-camera" class="back-btn" style="padding: 10px 15px; margin-left: 10px;">Enable Cam</button>
+    </div>
+  </main>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>

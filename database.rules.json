@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "rooms": {
+      "$room_id": {
+        ".read": "true",
+        ".write": "true"
+      }
+    },
+    "waitlist": {
+      "emails": {
+        "$email_hash": {
+          ".read": "true",
+          ".write": "!data.exists() && newData.child('email').isString() && newData.child('timestamp').isNumber()"
+        }
+      },
+      "count": {
+        ".read": "true",
+        ".write": "true"
+      }
+    }
+  }
+}

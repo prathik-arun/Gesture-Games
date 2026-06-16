@@ -60,18 +60,29 @@ let highScores = [];
 function loadHighScores() {
   try {
     const raw = localStorage.getItem('gesture_snake_scores');
-    highScores = raw ? JSON.parse(raw) : [25, 15, 8];
+    const parsed = raw ? JSON.parse(raw) : [25, 15, 8];
+    highScores = parsed.map(item => {
+      if (typeof item === 'number') {
+        return { name: 'System', score: item };
+      }
+      return item;
+    });
   } catch (e) {
-    highScores = [25, 15, 8];
+    highScores = [
+      { name: 'System', score: 25 },
+      { name: 'System', score: 15 },
+      { name: 'System', score: 8 }
+    ];
   }
-  highScores.sort((a, b) => b - a);
-  if (hudHighscore) {
-    hudHighscore.innerText = String(highScores[0]).padStart(5, '0');
+  highScores.sort((a, b) => b.score - a.score);
+  if (hudHighscore && highScores.length > 0) {
+    hudHighscore.innerText = String(highScores[0].score).padStart(5, '0');
   }
 }
 function saveHighScore(score) {
-  highScores.push(score);
-  highScores.sort((a, b) => b - a);
+  const name = localStorage.getItem('currentUserDisplayName') || 'Guest';
+  highScores.push({ name: name, score: score });
+  highScores.sort((a, b) => b.score - a.score);
   highScores = highScores.slice(0, 5); // Keep top 5
   localStorage.setItem('gesture_snake_scores', JSON.stringify(highScores));
   loadHighScores();
@@ -84,7 +95,7 @@ function renderLeaderboards() {
     highScores.forEach((s, idx) => {
       const row = document.createElement('div');
       row.className = `leaderboard-row ${idx === 0 ? 'high' : ''}`;
-      row.innerHTML = `<span class="rank">${idx + 1}.</span> <span class="score">${String(s).padStart(5, '0')}</span>`;
+      row.innerHTML = `<span class="rank">${idx + 1}. ${s.name || 'Guest'}</span> <span class="score">${String(s.score).padStart(5, '0')}</span>`;
       el.appendChild(row);
     });
   };

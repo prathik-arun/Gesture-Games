@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Strike 3D — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Load Premium Modern Typographies -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Include Three.js for 3D graphics rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Day Light Sky Vignette Overlay -->
+    <div class="vignette"></div>
+    <div id="damage-flash"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" id="btn-back-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Minimalist Center Crosshair -->
+    <div id="crosshair"></div>
+
+    <!-- Dual-Hand Screen Reticles -->
+    <div id="reticle-left" class="gesture-reticle">
+      <div class="reticle-dot left-dot"></div>
+      <div class="reticle-ring left-ring"></div>
+      <div class="reticle-label">L / MOVE</div>
+    </div>
+
+    <div id="reticle-right" class="gesture-reticle">
+      <div class="reticle-dot right-dot"></div>
+      <div class="reticle-ring right-ring"></div>
+      <div class="reticle-label">R / AIM</div>
+    </div>
+
+    <!-- On-Screen Air Gamepad Overlay -->
+    <div id="air-gamepad" style="display: none;">
+      <!-- Left Movement D-Pad -->
+      <div id="left-gamepad">
+        <div class="gamepad-btn" id="btn-forward">
+          <span class="btn-arrow">▲</span>
+          <span class="btn-lbl">FWD</span>
+        </div>
+        <div class="gamepad-btn-row">
+          <div class="gamepad-btn" id="btn-left">
+            <span class="btn-arrow">◀</span>
+            <span class="btn-lbl">LEFT</span>
+          </div>
+          <div class="gamepad-center-logo">✛</div>
+          <div class="gamepad-btn" id="btn-right">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-lbl">RIGHT</span>
+          </div>
+        </div>
+        <div class="gamepad-btn" id="btn-backward">
+          <span class="btn-arrow">▼</span>
+          <span class="btn-lbl">BACK</span>
+        </div>
+      </div>
+
+      <!-- Right Action Buttons -->
+      <div id="right-gamepad">
+        <div class="gamepad-btn action-btn" id="btn-reload">
+          <span class="action-lbl">RELOAD</span>
+        </div>
+        <div class="gamepad-btn action-btn" id="btn-shoot">
+          <span class="action-lbl">FIRE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="health-container">
+            <div class="health-label">HP:</div>
+            <div class="health-bar-bg">
+              <div id="health-bar-fill"></div>
+            </div>
+          </div>
+          <div class="hud-item" style="font-size:0.8rem; color:#bbb;">
+            WEAPON: <span style="color:#00ff55; text-shadow:0 0 5px rgba(0,255,85,0.4);">AWP SNIPER RIFLE</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item">WAVE: <span id="hud-wave">1</span></div>
+          <div class="hud-item">AMMO: <span id="hud-ammo">30 / 30</span></div>
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Center Announcements -->
+    <div id="announcement">WAVE 1</div>
+    <div id="reload-indicator">RELOADING...</div>
+    <div id="crit-announcement">CRIT HEADSHOT!</div>
+    <div id="powerup-hud">RAPID FIRE ACTIVE!</div>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">CYBER STRIKE 3D</h1>
+      <p>A bright 3D first-person voxel shooter operated entirely hands-free using on-screen air controls.</p>
+      
+      <div class="control-expl">
+        <div style="font-weight:bold; font-size:0.85rem; border-bottom:1px solid #00ffcc; padding-bottom:5px; margin-bottom:8px; text-transform:uppercase; color:#00ffcc;">Controls (100% Hands-Free Turret Defender)</div>
+        <div><span>AIM CAMERA</span> - Raise your dominant hand and move it to steer your sniper scope view</div>
+        <div><span>AUTO-FIRE</span> - Simply hover the crosshair over any cyber-virus bot to fire automatically!</div>
+        <div><span>RELOAD</span> - Hover your hand cursor over the RELOAD button on the right, or wait for auto-reload at 0 ammo</div>
+        <div style="margin-top:10px; color:#555; font-size:0.7rem; border-top: 1px solid #222; padding-top: 5px;">
+          No-Touch Menu: Hover your hand cursor over buttons for 1.5 seconds to select them!
+        </div>
+        <div style="margin-top:5px; color:#444; font-size:0.65rem;">Fallback: Move mouse to aim, Left-Click or hover over enemy to shoot, R to reload.</div>
+      </div>
+
+      <!-- Hover-to-Click Start Button -->
+      <button id="btn-enter-calibration" class="btn hover-btn">
+        <span class="hover-progress"></span>
+        <span class="btn-text">Hover to Start & Calibrate</span>
+      </button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Sensor Calibration</h2>
+              <p>Position your camera and calibrate controls before entering the grid.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Grant Camera Permissions</div>
+                  <div class="step-desc">Hover over "Enable" to authorize your webcam stream.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary hover-btn" style="padding: 6px 15px; font-size:0.75rem;">
+                    <span class="hover-progress"></span>
+                    <span class="btn-text">Enable</span>
+                  </button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Stand Back & Remain Still</div>
+                  <div class="step-desc">Step back 5-7 ft to calibrate background noise levels.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Steering & Camera Aiming</div>
+                  <div class="step-desc">Steer your right hand reticle left and right past deadzones.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">3</div>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div id="step-4" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">4. Test Reload Trigger</div>
+                  <div class="step-desc">Hover your reticle over the RELOAD button in the bottom right corner.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-4-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">4</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Motion Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">L-HAND (MOVE)</span>
+                <span id="stat-walk" class="status-value val-false">NO HAND</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">R-HAND (AIM)</span>
+                <span id="stat-lean" class="status-value val-center">NO HAND</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">L-PAD SELECT</span>
+                <span id="stat-gesture" class="status-value val-none">NONE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <!-- Hover-to-Click Enter Arena Button -->
+          <button id="btn-start-game" class="btn btn-start-game hover-btn" disabled>
+            <span class="hover-progress"></span>
+            <span class="btn-text">Hover to Enter Arena</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1 class="gameover-title">GRID TERMINATED</h1>
+      <p>Your systems were overwhelmed by the cyber-viruses.</p>
+      
+      <div class="gameover-stats">
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color:#888;">WAVES CLEARED: <span id="go-wave" style="color:#00ffcc;">1</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">Leaderboard</div>
+        <div id="gameover-leaderboard">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- Hover-to-Click Restart Button -->
+      <button id="btn-restart" class="btn hover-btn" style="border-color:#00ffcc; margin-top: 15px;">
+        <span class="hover-progress"></span>
+        <span class="btn-text">Hover to Respawn</span>
+      </button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="direction-indicators">
+        <span id="ind-left" class="dir-indicator">◀ L-PAD</span>
+        <span id="ind-walk" class="dir-indicator">▲ ACTIVE</span>
+        <span id="ind-right" class="dir-indicator">R-PAD ▶</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Gemini Status:</span><span id="dbg-gemini" class="debug-val">disconnected</span></div>
+      <div class="debug-row"><span>Gemini Walk:</span><span id="dbg-ai-walk" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Flow Motion:</span><span id="dbg-flow-motion" class="debug-val">0.00 / 0.00</span></div>
+      <div class="debug-row"><span>Flow Lean Ind:</span><span id="dbg-flow-lean" class="debug-val">0.00 (center)</span></div>
+      <div class="debug-row"><span>L-Hand Pos:</span><span id="dbg-hand" class="debug-val">false</span></div>
+      <div class="debug-row"><span>R-Hand Pos:</span><span id="dbg-reticle" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Pinch Dist:</span><span id="dbg-pinch" class="debug-val">1.00</span></div>
+      <div class="debug-row"><span>Voice Cmd:</span><span id="dbg-voice-cmd" class="debug-val">none</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic Engine -->
+  <script src="game.js"></script>
+</body>
+</html>

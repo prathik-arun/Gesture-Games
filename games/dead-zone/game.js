@@ -57,17 +57,29 @@ let highScores = [];
 function loadHighScores() {
   try {
     const raw = localStorage.getItem('deadzone_scores');
-    highScores = raw ? JSON.parse(raw) : [1500, 800, 300];
+    const parsed = raw ? JSON.parse(raw) : [1500, 800, 300];
+    highScores = parsed.map(item => {
+      if (typeof item === 'number') {
+        return { name: 'System', score: item };
+      }
+      return item;
+    });
   } catch (e) {
-    highScores = [1500, 800, 300];
+    highScores = [
+      { name: 'System', score: 1500 },
+      { name: 'System', score: 800 },
+      { name: 'System', score: 300 }
+    ];
   }
-  highScores.sort((a, b) => b - a);
+  highScores.sort((a, b) => b.score - a.score);
 }
 function saveHighScore(score) {
-  highScores.push(score);
-  highScores.sort((a, b) => b - a);
+  const name = localStorage.getItem('currentUserDisplayName') || 'Guest';
+  highScores.push({ name: name, score: score });
+  highScores.sort((a, b) => b.score - a.score);
   highScores = highScores.slice(0, 5); // Keep top 5
   localStorage.setItem('deadzone_scores', JSON.stringify(highScores));
+  loadHighScores();
 }
 function renderLeaderboards() {
   loadHighScores();
@@ -77,7 +89,7 @@ function renderLeaderboards() {
     highScores.forEach((s, idx) => {
       const row = document.createElement('div');
       row.className = `leaderboard-row ${idx === 0 ? 'high' : ''}`;
-      row.innerHTML = `<span class="rank">${idx + 1}.</span> <span class="score">${String(s).padStart(5, '0')}</span>`;
+      row.innerHTML = `<span class="rank">${idx + 1}. ${s.name || 'Guest'}</span> <span class="score">${String(s.score).padStart(5, '0')}</span>`;
       el.appendChild(row);
     });
   };
