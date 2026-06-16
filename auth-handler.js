@@ -300,7 +300,8 @@ const GAMES_CONFIG = {
   'cyber-breaker': { name: 'Cyber Breaker', icon: '🧱', storageKey: 'cyber_breaker_scores', threshold: 50 },
   'keepy-uppy': { name: 'Neon Keepy-Uppy', icon: '🎈', storageKey: 'keepy_uppy_scores', threshold: 10 },
   'cyber-strike-3d': { name: 'Cyber Strike 3D', icon: '⚡', storageKey: 'cyberstrike_3d_leaderboard', threshold: 300 },
-  'shadow-fighter': { name: 'Shadow Fighter', icon: '✊', storageKey: 'shadow_fighter_scores', threshold: 30 }
+  'shadow-fighter': { name: 'Shadow Fighter', icon: '✊', storageKey: 'shadow_fighter_scores', threshold: 30 },
+  'rhythm-saber': { name: 'Rhythm Saber', icon: '⚔️', storageKey: 'rhythm_saber_scores', threshold: 100 }
 };
 
 const ACHIEVEMENTS_LIST = [
@@ -312,7 +313,8 @@ const ACHIEVEMENTS_LIST = [
   { id: 'brick_smasher', name: 'Brick Smasher', desc: 'Score 50+ in Cyber Breaker', icon: '🧱', color: '#9b59b6', glow: 'rgba(155, 89, 182, 0.4)' },
   { id: 'balloons_maestro', name: 'Balloons Maestro', desc: 'Score 10+ in Neon Keepy-Uppy', icon: '🎈', color: '#3498db', glow: 'rgba(52, 152, 219, 0.4)' },
   { id: 'deadeye_sniper', name: 'Deadeye Sniper', desc: 'Score 300+ in Cyber Strike 3D', icon: '⚡', color: '#1abc9c', glow: 'rgba(26, 188, 156, 0.4)' },
-  { id: 'dodge_master', name: 'Dodge Master', desc: 'Score 30+ in Shadow Fighter', icon: '✊', color: '#ff5500', glow: 'rgba(255, 85, 0, 0.4)' }
+  { id: 'dodge_master', name: 'Dodge Master', desc: 'Score 30+ in Shadow Fighter', icon: '✊', color: '#ff5500', glow: 'rgba(255, 85, 0, 0.4)' },
+  { id: 'saber_master', name: 'Saber Master', desc: 'Score 100+ in Rhythm Saber', icon: '⚔️', color: '#ff007f', glow: 'rgba(255, 0, 127, 0.4)' }
 ];
 
 let currentStats = {};
@@ -457,7 +459,8 @@ const syncStatsAndAchievements = async (uid, userDisplayName) => {
                        ach.id === 'brick_smasher' ? 'cyber-breaker' :
                        ach.id === 'balloons_maestro' ? 'keepy-uppy' :
                        ach.id === 'deadeye_sniper' ? 'cyber-strike-3d' :
-                       ach.id === 'dodge_master' ? 'shadow-fighter' : null;
+                       ach.id === 'dodge_master' ? 'shadow-fighter' :
+                       ach.id === 'saber_master' ? 'rhythm-saber' : null;
 
         if (gameId && mergedStats[gameId] >= GAMES_CONFIG[gameId].threshold) {
           shouldUnlock = true;

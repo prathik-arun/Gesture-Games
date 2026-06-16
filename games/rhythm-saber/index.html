@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhythm Saber — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- CDNs for Three.js and MediaPipe Hands -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Viewport Glitch Overlays -->
+    <div id="damage-flash"></div>
+    <div id="hit-flash"></div>
+
+    <!-- Return to lobby button -->
+    <button class="back-to-lobby" id="btn-back-lobby" onclick="window.location.href='../../lobby.html'">← Lobby</button>
+
+    <!-- 3D WebGL Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active Gameplay HUD -->
+    <div id="hud" style="display: none;">
+      <!-- HUD Left: Health & Audio Mode -->
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="health-container">
+            <div class="health-label">HP:</div>
+            <div class="health-bar-bg">
+              <div id="health-bar-fill"></div>
+            </div>
+          </div>
+          <div class="hud-item" style="font-size: 0.8rem; color: #8b85a1;">
+            TRACK: <span id="hud-track" style="color: var(--neon-cyan); text-shadow: var(--glow-cyan);">SYNTHWAVE_BEAT_BPM120</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- HUD Right: Score & Combos -->
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item">SCORE: <span id="hud-score">00000</span></div>
+          <div id="combo-container" style="margin-top: 5px;">
+            <div id="hud-combo">COMBO x0</div>
+            <div id="hud-multiplier">MULTIPLIER: 1X</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Large Centered Text Announcements -->
+    <div id="announcement">READY PLAYER ONE</div>
+    <div id="combo-popup">COMBO UP!</div>
+
+    <!-- Main Title Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">RHYTHM SABER</h1>
+      <p>Slash oncoming neon blocks with your hand cursor in sync with driving synthwave music tracks. Complete hands-free play!</p>
+      
+      <div class="control-expl">
+        <div style="font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.95rem; color: var(--neon-cyan); border-bottom: 1px solid var(--border-cyan); padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase;">Neon Operative Controls</div>
+        <div><span>NEON SABER (SINGLE HAND)</span> - Mirror tracking: raise either hand to steer the cyan laser saber.</div>
+        <div><span>SLASH WHITE MARKS</span> - Swipe your cyan saber through oncoming Cyan cubes with White Marks to score points. No strict swipe direction needed!</div>
+        <div><span>AVOID BLACK MARKS</span> - Avoid hitting Charcoal cubes with Black/Red Marks. Slicing them deducts points (-50) and health (-15 HP). Let them pass safely!</div>
+        <div><span>MOUSE FALLBACK</span> - Drag mouse horizontally to steer the saber. Tap spacebar/left-click to slice.</div>
+        <div style="margin-top: 15px; color: var(--text-muted); font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+          Sensor Menu Mode: Hover your hand cursor over buttons for 1.5 seconds to click!
+        </div>
+      </div>
+
+      <!-- Start Calibration Button -->
+      <button id="btn-enter-calibration" class="btn">
+        <span class="hover-progress"></span>
+        <span class="btn-text">Hover to Start & Calibrate</span>
+      </button>
+    </div>
+
+    <!-- Calibration / Onboarding Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps Checklist -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Neural Alignment</h2>
+              <p>Authorize camera sensors and align tracking layers before booting into the cyber grid.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1: Camera permissions -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Link Camera Node</div>
+                  <div class="step-desc">Hover over "Link Feed" to authorize webcam tracking.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary">
+                    <span class="hover-progress"></span>
+                    <span class="btn-text">Link Feed</span>
+                  </button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2: Optical noise calibration -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Noise Level Check</div>
+                  <div class="step-desc">Stand still and back 4-7 ft from screen to clear environment vectors.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3: Range / Hand coordinate calibration -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Calibrate Saber range</div>
+                  <div class="step-desc">Raise your hand and shift it side-to-side to test horizontal reach.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Camera Video feed -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">L-HAND</span>
+                <span id="stat-left" class="status-value val-false">OFFLINE</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">R-HAND (CYAN)</span>
+                <span id="stat-right" class="status-value val-false">NO FEED</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">ALIGNMENT</span>
+                <span id="stat-align" class="status-value val-none">WAITING</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm launch button -->
+        <div style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>
+            <span class="hover-progress"></span>
+            <span class="btn-text">Hover to Load Arena</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1 class="gameover-title">GRID TERMINATED</h1>
+      <p>Your cyber rhythm synchrony dropped below parameters.</p>
+      
+      <div class="gameover-stats">
+        <span class="score-val" id="go-score">SCORE: 0</span>
+        <p style="font-size:0.9rem; color: var(--text-muted); margin-top: 10px;">PEAK COMBO: <span id="go-combo" style="color: var(--neon-pink); text-shadow: var(--glow-pink);">0</span></p>
+      </div>
+
+      <div class="leaderboard-box">
+        <div class="leaderboard-title">High Score Log</div>
+        <div id="gameover-leaderboard">
+          <!-- Populated dynamically via localStorage -->
+        </div>
+      </div>
+
+      <!-- Hover click restart -->
+      <button id="btn-restart" class="btn" style="border-color: var(--neon-cyan); color: var(--neon-cyan); text-shadow: var(--glow-cyan); margin-top: 10px;">
+        <span class="hover-progress"></span>
+        <span class="btn-text">Hover to Respawn</span>
+      </button>
+    </div>
+
+    <!-- Bottom Left Mini Webcam overlay -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Neural Sensor</div>
+      <div class="direction-indicators">
+        <span id="ind-right" class="dir-indicator">NEON SABER</span>
+      </div>
+    </div>
+
+    <!-- Bottom Right Debug overlay -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Matrix</div>
+      <div class="debug-row"><span>Sensor Status:</span><span id="dbg-status" class="debug-val">connecting</span></div>
+      <div class="debug-row"><span>MediaPipe Hands:</span><span id="dbg-mediapipe" class="debug-val">loading</span></div>
+      <div class="debug-row"><span>L-Saber (Pink):</span><span id="dbg-left-saber" class="debug-val">offline</span></div>
+      <div class="debug-row"><span>R-Saber (Cyan):</span><span id="dbg-right-saber" class="debug-val">offline</span></div>
+      <div class="debug-row"><span>System FPS:</span><span id="dbg-fps" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Active Notes:</span><span id="dbg-notes" class="debug-val">0</span></div>
+    </div>
+  </div>
+
+  <!-- Game logic script -->
+  <script src="game.js"></script>
+</body>
+</html>
