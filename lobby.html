@@ -27,6 +27,8 @@
   </script>
 </head>
 <body>
+  <!-- Dynamic Grid Gravity Well & Interactive Constellation Canvas -->
+  <canvas id="lobby-canvas-bg"></canvas>
   <!-- Header / Nav -->
   <header>
     <div class="container">
@@ -85,10 +87,11 @@
       <h2 class="section-title">Games Lobby</h2>
       <div class="lobby-grid">
         <!-- Dead Zone (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-deadzone">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <div class="game-icon">☣</div>
+            <img src="assets/thumbnails/dead_zone_thumb.png" alt="Dead Zone Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Dead Zone</h3>
@@ -99,10 +102,11 @@
         </div>
 
         <!-- Gesture Ninja (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-ninja">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <div class="game-icon">🥷</div>
+            <img src="assets/thumbnails/gesture_ninja_thumb.png" alt="Gesture Ninja Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Gesture Ninja</h3>
@@ -113,10 +117,11 @@
         </div>
 
         <!-- Flappy Mouth (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-mouth">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <div class="game-icon">🐦</div>
+            <img src="assets/thumbnails/flappy_mouth_thumb.png" alt="Flappy Mouth Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Flappy Mouth</h3>
@@ -127,10 +132,11 @@
         </div>
 
         <!-- Gesture Snake (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-snake">
           <div class="game-preview">
-            <span class="badge" style="background:#00ff88; color:#020202; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#00ff88; text-shadow:0 0 10px rgba(0, 255, 136, 0.4)">🐍</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/gesture_snake_thumb.png" alt="Gesture Snake Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Gesture Snake</h3>
@@ -141,10 +147,11 @@
         </div>
 
         <!-- Cyber Breaker (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-breaker">
           <div class="game-preview">
-            <span class="badge" style="background:#00e5ff; color:#020202; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#00e5ff; text-shadow:0 0 10px rgba(0, 229, 255, 0.4)">🧱</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/cyber_breaker_thumb.png" alt="Cyber Breaker Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Cyber Breaker</h3>
@@ -155,10 +162,11 @@
         </div>
 
         <!-- Neon Keepy-Uppy (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-keepy">
           <div class="game-preview">
-            <span class="badge" style="background:#ff00ff; color:#020202; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff00ff; text-shadow:0 0 10px rgba(255, 0, 255, 0.4)">🎈</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/keepy_uppy_thumb.png" alt="Neon Keepy-Uppy Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Neon Keepy-Uppy</h3>
@@ -169,10 +177,11 @@
         </div>
 
         <!-- Cyber Strike 3D (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-strike">
           <div class="game-preview">
-            <span class="badge" style="background:#00e5ff; color:#020202; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#00e5ff; text-shadow:0 0 10px rgba(0, 229, 255, 0.4)">⚡</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/cyber_strike_3d_thumb.png" alt="Cyber Strike 3D Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Cyber Strike 3D</h3>
@@ -183,10 +192,11 @@
         </div>
 
         <!-- Shadow Fighter (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-shadow">
           <div class="game-preview">
-            <span class="badge" style="background:#ff5500; color:#020202; box-shadow: 0 0 10px rgba(255, 85, 0, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff5500; text-shadow: 0 0 10px rgba(255, 85, 0, 0.4);">✊</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/shadow_fighter_thumb.png" alt="Shadow Fighter Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Shadow Fighter</h3>
@@ -197,10 +207,11 @@
         </div>
 
         <!-- Gesture Skribbl (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-skribbl">
           <div class="game-preview">
-            <span class="badge" style="background:#ff00cc; color:#020202; box-shadow: 0 0 10px rgba(255, 0, 204, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff00cc; text-shadow: 0 0 10px rgba(255, 0, 204, 0.4)">🎨</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/gesture_skribbl_thumb.png" alt="Gesture Skribbl Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Gesture Skribbl</h3>
@@ -211,10 +222,11 @@
         </div>
 
         <!-- Gesture Charades (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-charades">
           <div class="game-preview">
-            <span class="badge" style="background:#9d00ff; color:#020202; box-shadow: 0 0 10px rgba(157, 0, 255, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#9d00ff; text-shadow: 0 0 10px rgba(157, 0, 255, 0.4)">🎭</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/gesture_charades_thumb.png" alt="Gesture Charades Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Gesture Charades</h3>
@@ -225,10 +237,11 @@
         </div>
 
         <!-- Rhythm Saber (LIVE) -->
-        <div class="game-card">
+        <div class="game-card theme-saber">
           <div class="game-preview">
-            <span class="badge" style="background:#ff007f; color:#020202; box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);">LIVE</span>
-            <div class="game-icon" style="color:#ff007f; text-shadow: 0 0 10px rgba(255, 0, 127, 0.4)">⚔️</div>
+            <span class="badge">LIVE</span>
+            <img src="assets/thumbnails/rhythm_saber_thumb.png" alt="Rhythm Saber Cover" class="game-cover-art">
+            <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
             <h3>Rhythm Saber</h3>
@@ -385,5 +398,308 @@
     });
   </script>
   <script type="module" src="auth-handler.js"></script>
+
+  <!-- Dynamic Grid Gravity Well & Interactive Constellation Canvas Script -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('lobby-canvas-bg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const mouse = { x: null, y: null, targetX: null, targetY: null, radius: 180 };
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.targetX = e.clientX;
+        mouse.targetY = e.clientY;
+        
+        // Spawn trail particles on mouse movement
+        if (mouse.x !== null) {
+          for (let i = 0; i < 2; i++) {
+            particles.push(new Particle(mouse.targetX, mouse.targetY, true));
+          }
+        }
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.targetX = null;
+        mouse.targetY = null;
+      });
+
+      // Click Shockwaves
+      const shockwaves = [];
+      window.addEventListener('mousedown', (e) => {
+        shockwaves.push({
+          x: e.clientX,
+          y: e.clientY,
+          radius: 0,
+          maxRadius: 280,
+          speed: 6,
+          force: 8
+        });
+      });
+
+      // Easing mouse coordinates
+      function updateMouse() {
+        if (mouse.targetX !== null) {
+          if (mouse.x === null) {
+            mouse.x = mouse.targetX;
+            mouse.y = mouse.targetY;
+          } else {
+            mouse.x += (mouse.targetX - mouse.x) * 0.08;
+            mouse.y += (mouse.targetY - mouse.y) * 0.08;
+          }
+        } else {
+          mouse.x = null;
+          mouse.y = null;
+        }
+      }
+
+      class Particle {
+        constructor(x = null, y = null, isTrail = false) {
+          this.isTrail = isTrail;
+          if (isTrail) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 1.8;
+            this.vy = (Math.random() - 0.5) * 1.8;
+            this.size = Math.random() * 2 + 1.5;
+            this.life = 1.0;
+            this.decay = 0.015 + Math.random() * 0.015;
+            // Shifting theme-consistent red/orange laser sparks
+            this.color = Math.random() > 0.5 ? 'rgba(231, 76, 60,' : 'rgba(230, 126, 34,';
+          } else {
+            this.reset();
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+          }
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.3;
+          this.vy = (Math.random() - 0.5) * 0.3;
+          this.size = Math.random() * 2.2 + 0.8;
+          this.pulse = Math.random() * Math.PI;
+          this.pulseSpeed = 0.01 + Math.random() * 0.02;
+          this.life = 1.0;
+        }
+        
+        update() {
+          if (this.isTrail) {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vx *= 0.98; // friction
+            this.vy *= 0.98;
+            this.life -= this.decay;
+          } else {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.pulse += this.pulseSpeed;
+            
+            // bounce off bounds slightly padded
+            if (this.x < -10 || this.x > width + 10) this.vx *= -1;
+            if (this.y < -10 || this.y > height + 10) this.vy *= -1;
+          }
+        }
+        
+        draw() {
+          ctx.beginPath();
+          if (this.isTrail) {
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `${this.color}${this.life})`;
+            ctx.fill();
+          } else {
+            const size = this.size + Math.sin(this.pulse) * 0.6;
+            ctx.arc(this.x, this.y, Math.max(0.1, size), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(192, 57, 43, ${0.35 + Math.sin(this.pulse) * 0.25})`; // primary red neon dots
+            ctx.fill();
+          }
+        }
+      }
+
+      const particles = [];
+      const baseParticleCount = 200;
+      for (let i = 0; i < baseParticleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      // Deform point based on gravity well around the mouse
+      function getWarpedPoint(x, y) {
+        if (mouse.x === null) return { x, y };
+        
+        const dx = x - mouse.x;
+        const dy = y - mouse.y;
+        const dist = Math.hypot(dx, dy);
+        
+        if (dist < mouse.radius) {
+          const force = Math.pow((mouse.radius - dist) / mouse.radius, 1.8);
+          // Pull coordinate towards the mouse to create space well
+          return {
+            x: x - (dx / dist) * force * 38,
+            y: y - (dy / dist) * force * 38
+          };
+        }
+        return { x, y };
+      }
+
+      function animate() {
+        ctx.fillStyle = '#060606';
+        ctx.fillRect(0, 0, width, height);
+
+        // --- 1. DRAW DYNAMIC GRID GRAVITY WELL ---
+        ctx.strokeStyle = 'rgba(192, 57, 43, 0.04)'; // faint red theme grid
+        ctx.lineWidth = 0.5;
+        const gridStep = 80;
+        
+        // Draw deforming vertical grid lines
+        for (let x = 0; x < width + gridStep; x += gridStep) {
+          ctx.beginPath();
+          for (let y = 0; y < height; y += 15) {
+            const pt = getWarpedPoint(x, y);
+            if (y === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.stroke();
+        }
+        
+        // Draw deforming horizontal grid lines
+        for (let y = 0; y < height + gridStep; y += gridStep) {
+          ctx.beginPath();
+          for (let x = 0; x < width; x += 15) {
+            const pt = getWarpedPoint(x, y);
+            if (x === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.stroke();
+        }
+
+        updateMouse();
+
+        // --- 2. UPDATE SHOCKWAVES & REPEL PARTICLES ---
+        for (let s = shockwaves.length - 1; s >= 0; s--) {
+          const sw = shockwaves[s];
+          sw.radius += sw.speed;
+          
+          if (sw.radius > sw.maxRadius) {
+            shockwaves.splice(s, 1);
+            continue;
+          }
+
+          // Render shockwave ripple ring
+          ctx.strokeStyle = `rgba(0, 229, 255, ${(1 - sw.radius / sw.maxRadius) * 0.4})`; // expanding cyan ring
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // --- 3. UPDATE & DRAW PARTICLES (CONSTELLATION + TRAILS) ---
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.update();
+          
+          // Remove dead trail particles
+          if (p.isTrail && p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          // Warp base particles towards the mouse
+          if (!p.isTrail && mouse.x !== null) {
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              p.x -= (dx / dist) * force * 1.5;
+              p.y -= (dy / dist) * force * 1.5;
+            }
+          }
+
+          // Apply shockwave physics
+          for (const sw of shockwaves) {
+            const dx = p.x - sw.x;
+            const dy = p.y - sw.y;
+            const dist = Math.hypot(dx, dy);
+            
+            // If particle is close to the shockwave expanding front, blast it outwards
+            if (Math.abs(dist - sw.radius) < 25 && dist > 0) {
+              const pushForce = (1 - sw.radius / sw.maxRadius) * sw.force;
+              p.vx = (p.vx || 0) + (dx / dist) * pushForce;
+              p.vy = (p.vy || 0) + (dy / dist) * pushForce;
+              
+              // Cap speed to keep velocities stable
+              const speed = Math.hypot(p.vx, p.vy);
+              if (speed > 8) {
+                p.vx = (p.vx / speed) * 8;
+                p.vy = (p.vy / speed) * 8;
+              }
+            }
+          }
+
+          // Friction damping on base particles to slow them down after shockwave blast
+          if (!p.isTrail) {
+            p.vx *= 0.95;
+            p.vy *= 0.95;
+            // minimum drift velocity
+            const baseDrift = 0.25;
+            if (Math.abs(p.vx) < baseDrift && Math.abs(p.vy) < baseDrift) {
+              p.vx = (Math.random() - 0.5) * 0.3;
+              p.vy = (Math.random() - 0.5) * 0.3;
+            }
+          }
+
+          p.draw();
+        }
+
+        // --- 4. DRAW CONSTELLATION LINKS ---
+        ctx.lineWidth = 0.5;
+        // Double loop to link nearby base particles
+        for (let i = 0; i < particles.length; i++) {
+          if (particles[i].isTrail) continue; // no constellation lines for trail dots
+          for (let j = i + 1; j < particles.length; j++) {
+            if (particles[j].isTrail) continue;
+            
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            
+            if (dist < 130) {
+              let alpha = (130 - dist) / 130 * 0.18;
+              
+              // Glow brighter if mouse is near
+              if (mouse.x !== null) {
+                const dxMouse = (particles[i].x + particles[j].x) / 2 - mouse.x;
+                const dyMouse = (particles[i].y + particles[j].y) / 2 - mouse.y;
+                const distMouse = Math.hypot(dxMouse, dyMouse);
+                if (distMouse < mouse.radius) {
+                  alpha += (mouse.radius - distMouse) / mouse.radius * 0.15;
+                }
+              }
+              
+              ctx.strokeStyle = `rgba(192, 57, 43, ${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+  </script>
 </body>
 </html>
