@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gesture Zone — Join the Waitlist</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   
   <!-- Developer Bypass Gate -->
@@ -96,7 +100,24 @@
     }
 
     .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
       margin-bottom: 1.5rem;
+    }
+
+    .brand-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 16px rgba(231, 76, 60, 0.6));
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
 
     .waitlist-logo {
@@ -460,6 +481,7 @@
   <div class="waitlist-wrapper">
     <div class="waitlist-card">
       <div class="logo-container">
+        <img src="assets/logo.png" alt="Gesture Zone Mascot" class="brand-logo">
         <div class="waitlist-logo">GESTURE <span>ZONE</span></div>
       </div>
       

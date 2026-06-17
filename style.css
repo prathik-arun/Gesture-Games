@@ -1082,3 +1082,17 @@ footer p {
   }
 }
 
+/* Brand Mascot Logo Styles */
+.logo-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(231, 76, 60, 0.7));
+  animation: floatLogoMini 3s ease-in-out infinite;
+}
+
+@keyframes floatLogoMini {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
