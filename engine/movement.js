@@ -47,6 +47,9 @@ class MovementController {
     
     // Flag to track whether Gemini is active
     this.isGeminiActive = false;
+
+    // Inject mobile-friendly styles and rotation alert
+    this.injectMobileStylesAndWarning();
   }
 
   onUpdate(callback) {
@@ -58,7 +61,12 @@ class MovementController {
     
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 320, height: 240, frameRate: { ideal: 30 } },
+        video: { 
+          width: { ideal: 320 }, 
+          height: { ideal: 240 }, 
+          frameRate: { ideal: 30 },
+          facingMode: "user"
+        },
         audio: false
       });
       this.videoElement.srcObject = this.stream;
@@ -80,6 +88,209 @@ class MovementController {
     } catch (e) {
       console.error('[Movement] Error accessing camera:', e);
       return false;
+    }
+  }
+
+  injectMobileStylesAndWarning() {
+    const inject = () => {
+      if (document.getElementById('mobile-styles-injected')) return;
+
+      // 1. Create and inject style tag
+      const style = document.createElement('style');
+      style.id = 'mobile-styles-injected';
+      style.textContent = `
+        /* Responsive tweaks for all gesture games on mobile screens */
+        @media (max-width: 900px) {
+          .calibration-box {
+            width: 95% !important;
+            max-width: 95vw !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 15px !important;
+            gap: 12px !important;
+            margin: auto !important;
+          }
+          .calibration-content-layout {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+          }
+          .calibration-header h2 {
+            font-size: 1.25rem !important;
+            letter-spacing: 1.5px !important;
+          }
+          .calibration-header p {
+            font-size: 0.75rem !important;
+          }
+          .camera-wrapper {
+            width: 100% !important;
+            max-width: 240px !important;
+            height: 180px !important;
+            margin: 0 auto !important;
+          }
+          .motion-status-display {
+            gap: 8px !important;
+          }
+          .status-indicator-box {
+            padding: 5px 2px !important;
+          }
+          .status-label {
+            font-size: 0.55rem !important;
+          }
+          .status-value {
+            font-size: 0.7rem !important;
+          }
+          .step-item {
+            padding: 10px 12px !important;
+          }
+          .step-name {
+            font-size: 0.8rem !important;
+            letter-spacing: 1px !important;
+          }
+          .step-desc {
+            font-size: 0.65rem !important;
+          }
+          .btn {
+            padding: 8px 15px !important;
+            font-size: 0.75rem !important;
+          }
+          .btn-start-game {
+            max-width: 100% !important;
+          }
+          #debug-panel {
+            display: none !important;
+          }
+          #camera-preview-container {
+            width: 80px !important;
+            bottom: 10px !important;
+            left: 10px !important;
+            padding: 3px !important;
+          }
+          #webcam-view {
+            width: 72px !important;
+            height: 54px !important;
+          }
+          .camera-label, .hand-tracking-light {
+            display: none !important;
+          }
+          #hud {
+            top: 55px !important;
+            padding: 5px 15px !important;
+            margin-top: 0 !important;
+          }
+          .hud-panel {
+            padding: 6px 12px !important;
+          }
+          .hud-item {
+            font-size: 0.8rem !important;
+          }
+          .back-to-lobby, .control-btn {
+            top: 10px !important;
+            padding: 5px 10px !important;
+            font-size: 0.7rem !important;
+          }
+          .back-to-lobby {
+            left: 10px !important;
+          }
+          .control-btn {
+            right: 10px !important;
+          }
+          .screen-overlay h1, .screen-overlay h1.game-title {
+            font-size: 1.8rem !important;
+            letter-spacing: 3px !important;
+          }
+          .screen-overlay p {
+            font-size: 0.8rem !important;
+            padding: 0 10px !important;
+            line-height: 1.4 !important;
+          }
+          .screen-overlay span.score-val {
+            font-size: 1.5rem !important;
+            margin: 5px 0 !important;
+          }
+          .control-expl {
+            padding: 10px 15px !important;
+            font-size: 0.65rem !important;
+            max-width: 90% !important;
+          }
+        }
+
+        /* Landscape warning layout */
+        #gesture-orientation-warning {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(6, 6, 6, 0.98);
+          z-index: 99999;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 20px;
+          box-sizing: border-box;
+          color: #eee;
+          font-family: 'Outfit', 'Courier Prime', sans-serif;
+        }
+        @media (max-width: 900px) and (orientation: portrait) {
+          body:not(.bypass-orientation-warning) #gesture-orientation-warning {
+            display: flex !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // 2. Create and inject landscape warning overlay
+      const warning = document.createElement('div');
+      warning.id = 'gesture-orientation-warning';
+      warning.innerHTML = `
+        <div style="font-size: 3.5rem; margin-bottom: 20px; animation: rotatePhone 2.5s ease-in-out infinite;">📱🔄</div>
+        <h2 style="font-family: 'Orbitron', 'Outfit', sans-serif; color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.4); margin-bottom: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Landscape Recommended</h2>
+        <p style="max-width: 380px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">This gesture game is designed to be played in landscape mode. Please rotate your device and prop it up (e.g. against a wall or stand) so that your upper body is clearly visible for tracking.</p>
+        <button id="btn-bypass-orientation" style="background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 10px 25px; border-radius: 4px; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease;">Play Anyway</button>
+        <style>
+          @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+          }
+          #btn-bypass-orientation:hover {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255,0,85,0.5);
+          }
+        </style>
+      `;
+      document.body.appendChild(warning);
+
+      document.getElementById('btn-bypass-orientation').addEventListener('click', () => {
+        document.body.classList.add('bypass-orientation-warning');
+      });
+
+      // 3. Clean toggle background button text on mobile to remove keyboard shortcuts
+      const cleanToggleButtons = () => {
+        const isMobile = /Mobi|Android|iPhone|iPad|Macintosh/i.test(navigator.userAgent) && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        const isNarrow = window.innerWidth <= 900;
+        
+        if (isMobile || isNarrow) {
+          const toggleBtn = document.getElementById('btn-toggle-bg') || document.querySelector('.control-btn');
+          if (toggleBtn) {
+            toggleBtn.textContent = 'Toggle Background';
+          }
+        }
+      };
+      
+      cleanToggleButtons();
+      window.addEventListener('resize', cleanToggleButtons);
+      setTimeout(cleanToggleButtons, 100);
+      setTimeout(cleanToggleButtons, 500);
+    };
+
+    if (document.body) {
+      inject();
+    } else {
+      document.addEventListener('DOMContentLoaded', inject);
     }
   }
 

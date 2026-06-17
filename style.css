@@ -133,6 +133,30 @@ header {
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+header nav {
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 100px;
+  opacity: 1;
+  visibility: visible;
+}
+
+header.scrolled {
+  padding: 0.8rem 0;
+  background-color: rgba(13, 13, 13, 0.9);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+header.scrolled nav {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  max-height: 0;
+  margin: 0 !important;
+  overflow: hidden;
 }
 
 header .container {
@@ -1066,8 +1090,55 @@ footer p {
   100% { opacity: 1; box-shadow: 0 0 12px var(--success); }
 }
 
-/* Responsive Dashboard */
+/* Responsive Overrides */
 @media (max-width: 768px) {
+  header {
+    padding: 1rem 0 !important;
+  }
+  header .container {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .logo {
+    font-size: 1.25rem !important;
+    letter-spacing: 2px !important;
+  }
+  nav ul {
+    gap: 15px !important;
+    padding: 0 !important;
+    margin: 5px 0 0 0 !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+  nav a {
+    font-size: 0.75rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .hero {
+    min-height: 50vh !important;
+    padding: 3rem 1rem !important;
+  }
+  .hero h1 {
+    font-size: 2.2rem !important;
+    letter-spacing: 3px !important;
+  }
+  .hero p {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .section-title {
+    font-size: 1.6rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .features, .lobby {
+    padding: 2.5rem 0 !important;
+  }
+
   .dashboard-body {
     flex-direction: column;
     gap: 20px;

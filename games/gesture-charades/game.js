@@ -78,7 +78,70 @@ document.addEventListener("DOMContentLoaded", () => {
   setupURLRoomCode();
   attachUIEventListeners();
   setupTopicToggle();
+  injectMobileStylesAndWarning();
 });
+
+function injectMobileStylesAndWarning() {
+  if (document.getElementById('mobile-styles-injected')) return;
+
+  // 1. Create and inject style tag
+  const style = document.createElement('style');
+  style.id = 'mobile-styles-injected';
+  style.textContent = `
+    /* Landscape warning layout */
+    #gesture-orientation-warning {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(6, 6, 6, 0.98);
+      z-index: 99999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      color: #eee;
+      font-family: 'Outfit', 'Courier Prime', sans-serif;
+    }
+    @media (max-width: 900px) and (orientation: portrait) {
+      body:not(.bypass-orientation-warning) #gesture-orientation-warning {
+        display: flex !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // 2. Create and inject landscape warning overlay
+  const warning = document.createElement('div');
+  warning.id = 'gesture-orientation-warning';
+  warning.innerHTML = `
+    <div style="font-size: 3.5rem; margin-bottom: 20px; animation: rotatePhone 2.5s ease-in-out infinite;">📱🔄</div>
+    <h2 style="font-family: 'Orbitron', 'Outfit', sans-serif; color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.4); margin-bottom: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Landscape Recommended</h2>
+    <p style="max-width: 380px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">This gesture game is designed to be played in landscape mode. Please rotate your device and prop it up (e.g. against a wall or stand) so that your upper body is clearly visible for tracking.</p>
+    <button id="btn-bypass-orientation" style="background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 10px 25px; border-radius: 4px; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease;">Play Anyway</button>
+    <style>
+      @keyframes rotatePhone {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(-90deg); }
+        100% { transform: rotate(0deg); }
+      }
+      #btn-bypass-orientation:hover {
+        background: #ff0055;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(255,0,85,0.5);
+      }
+    </style>
+  `;
+  document.body.appendChild(warning);
+
+  document.getElementById('btn-bypass-orientation').addEventListener('click', () => {
+    document.body.classList.add('bypass-orientation-warning');
+  });
+}
 
 // Pre-fill nickname
 function setupPreFillName() {
@@ -671,7 +734,10 @@ async function toggleCameraManual() {
   camStateVal.className = "status-val idle";
   
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: "user" }, 
+      audio: false 
+    });
     localStream = stream;
     isCameraEnabled = true;
     btn.innerText = "Disable Cam";
@@ -711,7 +777,10 @@ async function setupWebRTCStream() {
     // Force enable camera if not already active
     if (!isCameraEnabled || !localStream) {
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        localStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: "user" }, 
+          audio: false 
+        });
         isCameraEnabled = true;
         document.getElementById("sensor-camera-state").innerText = "Connected";
         document.getElementById("sensor-camera-state").className = "status-val connected";
