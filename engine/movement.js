@@ -62,8 +62,8 @@ class MovementController {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: { 
-          width: { ideal: 320 }, 
-          height: { ideal: 240 }, 
+          width: { ideal: 640, max: 1280 }, 
+          height: { ideal: 480, max: 720 }, 
           frameRate: { ideal: 30 },
           facingMode: "user"
         },
@@ -211,6 +211,124 @@ class MovementController {
             padding: 10px 15px !important;
             font-size: 0.65rem !important;
             max-width: 90% !important;
+          }
+        }
+
+        /* Landscape and constrained height mode for overlays */
+        @media (max-height: 550px) {
+          .screen-overlay {
+            justify-content: flex-start !important;
+            overflow-y: auto !important;
+            padding: 20px 10px !important;
+          }
+          .screen-overlay h1, .screen-overlay h1.game-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 5px !important;
+            letter-spacing: 3px !important;
+          }
+          .screen-overlay p {
+            font-size: 0.75rem !important;
+            margin-bottom: 8px !important;
+            line-height: 1.3 !important;
+          }
+          .control-expl {
+            padding: 8px 12px !important;
+            margin: 5px 0 !important;
+            max-width: 95% !important;
+            font-size: 0.65rem !important;
+          }
+          .leaderboard-box {
+            margin: 5px 0 !important;
+            width: 220px !important;
+          }
+          .leaderboard-title {
+            margin-bottom: 4px !important;
+          }
+          .btn {
+            padding: 8px 20px !important;
+            font-size: 0.75rem !important;
+            margin-top: 8px !important;
+          }
+          /* Compact preview and calibration */
+          .calibration-box {
+            padding: 10px !important;
+            gap: 8px !important;
+            max-height: 98vh !important;
+          }
+          .calibration-header {
+            margin-bottom: 2px !important;
+          }
+          .calibration-header h2 {
+            font-size: 1.1rem !important;
+          }
+          .camera-wrapper {
+            width: 200px !important;
+            height: 150px !important;
+          }
+          .step-item {
+            padding: 8px 10px !important;
+          }
+          .step-name {
+            font-size: 0.75rem !important;
+          }
+          .step-desc {
+            font-size: 0.6rem !important;
+          }
+          .calibration-actions {
+            margin-top: 5px !important;
+          }
+        }
+
+        /* Compact horizontal top row HUD layout in mobile landscape */
+        @media (max-width: 900px) and (min-width: 550px) {
+          #hud {
+            top: 10px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: auto !important;
+            max-width: 55% !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 10px !important;
+            padding: 0 !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-top: 0 !important;
+          }
+          .hud-left, .hud-right {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+          }
+          .hud-panel {
+            flex-direction: row !important;
+            gap: 12px !important;
+            padding: 5px 10px !important;
+            align-items: center !important;
+            white-space: nowrap !important;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+          }
+          .hud-item {
+            font-size: 0.7rem !important;
+            margin-top: 0 !important;
+          }
+          .lives-container {
+            gap: 4px !important;
+          }
+          .hud-label {
+            font-size: 0.7rem !important;
+          }
+          #lives-display {
+            font-size: 0.9rem !important;
+            letter-spacing: 1.5px !important;
+          }
+          /* Scale other games items if needed */
+          .health-container {
+            gap: 4px !important;
+          }
+          .health-bar-bg {
+            width: 60px !important;
+            height: 8px !important;
           }
         }
 

@@ -471,6 +471,66 @@
         text-align: center;
       }
     }
+
+    /* Landscape and constrained height mode for waitlist */
+    @media (max-height: 550px) {
+      .waitlist-wrapper {
+        padding: 15px 10px !important;
+        justify-content: flex-start !important;
+        overflow-y: auto !important;
+      }
+      .waitlist-card {
+        padding: 1.5rem !important;
+      }
+      .brand-logo {
+        width: 60px !important;
+        height: 60px !important;
+      }
+      .logo-container {
+        margin-bottom: 0.8rem !important;
+      }
+      .waitlist-logo {
+        font-size: 1.6rem !important;
+      }
+      .waitlist-title {
+        font-size: 0.95rem !important;
+        margin-bottom: 0.8rem !important;
+      }
+      .waitlist-desc {
+        font-size: 0.75rem !important;
+        margin-bottom: 1.2rem !important;
+      }
+      .counter-section {
+        margin-bottom: 1.2rem !important;
+      }
+      .digit-box {
+        width: 28px !important;
+        height: 38px !important;
+        font-size: 1.2rem !important;
+      }
+      .waitlist-input, .btn-submit {
+        padding: 10px !important;
+        font-size: 0.8rem !important;
+      }
+      .success-ticket {
+        padding: 1rem !important;
+      }
+      .ticket-number {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.8rem !important;
+      }
+      .diagnostics-hud {
+        position: static !important;
+        margin-top: 20px !important;
+        text-align: center !important;
+      }
+      .system-status {
+        position: static !important;
+        margin-top: 10px !important;
+        text-align: center !important;
+        display: inline-block !important;
+      }
+    }
   </style>
 </head>
 <body>

@@ -561,22 +561,22 @@ class GameFruit {
     const gravity = 0.14;
     
     if (!this.isSliced) {
-      this.vy += gravity;
-      this.x += this.vx;
-      this.y += this.vy;
-      this.rotation += this.rotSpeed;
+      this.vy += gravity * dt;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.rotation += this.rotSpeed * dt;
     } else {
       if (!this.half1 || !this.half2) return; // Guard against null halves (e.g. exploded bomb)
       // Update both halves
-      this.half1.vy += gravity;
-      this.half1.x += this.half1.vx;
-      this.half1.y += this.half1.vy;
-      this.half1.rotation += this.half1.rotSpeed;
+      this.half1.vy += gravity * dt;
+      this.half1.x += this.half1.vx * dt;
+      this.half1.y += this.half1.vy * dt;
+      this.half1.rotation += this.half1.rotSpeed * dt;
       
-      this.half2.vy += gravity;
-      this.half2.x += this.half2.vx;
-      this.half2.y += this.half2.vy;
-      this.half2.rotation += this.half2.rotSpeed;
+      this.half2.vy += gravity * dt;
+      this.half2.x += this.half2.vx * dt;
+      this.half2.y += this.half2.vy * dt;
+      this.half2.rotation += this.half2.rotSpeed * dt;
     }
   }
   
@@ -934,10 +934,10 @@ class JuiceParticle {
   }
   
   update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vy += 0.12; // gravity on juice
-    this.alpha -= this.decay;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.vy += 0.12 * dt;
+    this.alpha -= this.decay * dt;
   }
   
   draw(gCtx) {
@@ -961,8 +961,8 @@ class ScreenAlert {
     this.alpha = 1.0;
   }
   update() {
-    this.y += this.vy;
-    this.alpha -= 0.018;
+    this.y += this.vy * dt;
+    this.alpha -= 0.018 * dt;
   }
   draw(gCtx) {
     gCtx.save();
@@ -1376,7 +1376,9 @@ function drawCalibrationOverlay() {
 // Core Game Rendering Loop
 // ----------------------------------------------------
 let lastTime = performance.now();
+let lastFrameTime = performance.now();
 let frameCount = 0;
+let dt = 1.0;
 
 function runLoop() {
   // Compute FPS
@@ -1387,6 +1389,13 @@ function runLoop() {
     frameCount = 0;
     lastTime = now;
   }
+  
+  // Compute delta time (dt = 1.0 means exactly 60fps)
+  const deltaMS = now - lastFrameTime;
+  lastFrameTime = now;
+  dt = deltaMS / 16.666;
+  if (dt > 4.0) dt = 4.0; // clamp to prevent tunneling/insane jumps on lag spikes
+  if (dt < 0.1) dt = 0.1;
   
   // 1. Process inputs and calibration if in calibrating phase
   if (currentGameState === GAME_STATE.CALIBRATING) {
@@ -1402,12 +1411,12 @@ function runLoop() {
     
     // Handle Screen Shake
     if (shakeTimer > 0) {
-      shakeTimer--;
+      shakeTimer -= dt;
       const dx = (Math.random() - 0.5) * shakeIntensity;
       const dy = (Math.random() - 0.5) * shakeIntensity;
       ctx.translate(dx, dy);
-      // Reduce intensity
-      shakeIntensity *= 0.95;
+      // Reduce intensity (scaled exponentially by dt)
+      shakeIntensity *= Math.pow(0.95, dt);
     }
     
     // Draw Background theme
@@ -1505,7 +1514,7 @@ function runLoop() {
     }
     
     // Spawning timer update
-    spawnTimer++;
+    spawnTimer += dt;
     if (spawnTimer >= spawnInterval) {
       spawnTimer = 0;
       spawnBatch();

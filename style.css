@@ -1167,3 +1167,93 @@ footer p {
   50% { transform: translateY(-4px); }
 }
 
+/* Landscape and Small Screen Height Tweaks */
+@media (max-height: 550px) {
+  header {
+    padding: 0.5rem 0 !important;
+  }
+  header.scrolled {
+    padding: 0.4rem 0 !important;
+  }
+  header nav {
+    max-height: 50px !important;
+  }
+  .hero {
+    min-height: 60vh !important;
+    padding: 2rem 1rem !important;
+  }
+  .hero h1 {
+    font-size: 2rem !important;
+    letter-spacing: 4px !important;
+  }
+  .hero p {
+    font-size: 0.9rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  .features, .lobby {
+    padding: 2rem 0 !important;
+  }
+  .section-title {
+    margin-bottom: 2rem !important;
+    font-size: 1.5rem !important;
+  }
+  .features-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+  .feature-card {
+    padding: 1.5rem !important;
+  }
+  .lobby-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 15px !important;
+  }
+  .game-card {
+    border-radius: 6px !important;
+  }
+  .game-preview {
+    height: 120px !important;
+  }
+  .game-content {
+    padding: 1rem !important;
+  }
+  .game-content h3 {
+    font-size: 1.05rem !important;
+  }
+  .game-content p {
+    font-size: 0.8rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .dashboard-modal-content {
+    padding: 1rem !important;
+    max-height: 95vh !important;
+  }
+  .dashboard-header {
+    padding-bottom: 1rem !important;
+    margin-bottom: 1rem !important;
+    gap: 15px !important;
+  }
+  .dashboard-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.5rem !important;
+  }
+  .dashboard-user-details h3 {
+    font-size: 1.2rem !important;
+  }
+  .dashboard-body {
+    flex-direction: column !important;
+    gap: 15px !important;
+    margin-bottom: 1rem !important;
+  }
+  .dashboard-section {
+    padding: 1rem !important;
+  }
+  .stats-grid, .achievements-grid {
+    max-height: 160px !important;
+  }
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+

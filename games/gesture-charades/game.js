@@ -735,7 +735,11 @@ async function toggleCameraManual() {
   
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: "user" }, 
+      video: { 
+        width: { ideal: 640, max: 1280 }, 
+        height: { ideal: 480, max: 720 }, 
+        facingMode: "user" 
+      }, 
       audio: false 
     });
     localStream = stream;
@@ -778,7 +782,11 @@ async function setupWebRTCStream() {
     if (!isCameraEnabled || !localStream) {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: "user" }, 
+          video: { 
+            width: { ideal: 640, max: 1280 }, 
+            height: { ideal: 480, max: 720 }, 
+            facingMode: "user" 
+          }, 
           audio: false 
         });
         isCameraEnabled = true;
