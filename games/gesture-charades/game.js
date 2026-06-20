@@ -121,7 +121,7 @@ function injectMobileStylesAndWarning() {
   warning.innerHTML = `
     <div style="font-size: 3.5rem; margin-bottom: 20px; animation: rotatePhone 2.5s ease-in-out infinite;">📱🔄</div>
     <h2 style="font-family: 'Orbitron', 'Outfit', sans-serif; color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.4); margin-bottom: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Landscape Recommended</h2>
-    <p style="max-width: 380px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">This gesture game is designed to be played in landscape mode. Please rotate your device and prop it up (e.g. against a wall or stand) so that your upper body is clearly visible for tracking.</p>
+    <p style="max-width: 420px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">Please rotate your device to landscape, then prop it up (e.g., against a wall or on a stand) so your upper body is clearly visible to the camera for optimal hand and gesture tracking.</p>
     <button id="btn-bypass-orientation" style="background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 10px 25px; border-radius: 4px; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease;">Play Anyway</button>
     <style>
       @keyframes rotatePhone {

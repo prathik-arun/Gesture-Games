@@ -35,9 +35,13 @@ class MovementController {
       lean: 'center', // 'left' | 'right' | 'center'
       jump: false,
       shoot: false,
+      mouthOpen: false,
       reload: false,
+      hands: [],
       confidence: 'high'
     };
+
+    this.currentHands = [];
 
     // Callback when movement state updates
     this.onUpdateCallback = null;
@@ -365,7 +369,7 @@ class MovementController {
       warning.innerHTML = `
         <div style="font-size: 3.5rem; margin-bottom: 20px; animation: rotatePhone 2.5s ease-in-out infinite;">📱🔄</div>
         <h2 style="font-family: 'Orbitron', 'Outfit', sans-serif; color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.4); margin-bottom: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Landscape Recommended</h2>
-        <p style="max-width: 380px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">This gesture game is designed to be played in landscape mode. Please rotate your device and prop it up (e.g. against a wall or stand) so that your upper body is clearly visible for tracking.</p>
+        <p style="max-width: 420px; font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 25px; font-family: inherit;">Please rotate your device to landscape, then prop it up (e.g., against a wall or on a stand) so your upper body is clearly visible to the camera for optimal hand and gesture tracking.</p>
         <button id="btn-bypass-orientation" style="background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 10px 25px; border-radius: 4px; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease;">Play Anyway</button>
         <style>
           @keyframes rotatePhone {
@@ -661,6 +665,7 @@ class MovementController {
     this.handLandmarks = null;
     this.handLandmarksList = [];
     this.handBox = null;
+    this.currentHands = [];
 
     let leftHandVisible = false;
     let leftHandRaised = false;
@@ -709,8 +714,10 @@ class MovementController {
         const handSize = Math.sqrt((wrist.x - middleBase.x) ** 2 + (wrist.y - middleBase.y) ** 2);
         const normalizedDist = dist2d / (handSize || 0.08);
 
+        let handPinching = false;
         if (normalizedDist < 0.45) {
           detectedPinch = true;
+          handPinching = true;
         }
 
         // Open Hand Check
@@ -723,6 +730,14 @@ class MovementController {
         if (extendedFingers >= 3 && normalizedDist >= 0.85) {
           detectedOpenHand = true;
         }
+
+        // Populate hand properties (flip x-axis coordinate for natural mirror alignment)
+        this.currentHands.push({
+          visible: true,
+          x: indexTip ? (1.0 - indexTip.x) : 0.5,
+          y: indexTip ? indexTip.y : 0.5,
+          isPinching: handPinching
+        });
       }
     }
 
@@ -828,7 +843,9 @@ class MovementController {
 
     // D. GESTURES: From local MediaPipe Hands or Voice reload
     this.state.shoot = this.isPinching;
+    this.state.mouthOpen = this.isMouthOpen;
     this.state.reload = this.isOpenHand || this.voiceReload;
+    this.state.hands = this.currentHands || [];
     
     // E. CONFIDENCE
     this.state.confidence = this.isGeminiActive ? this.geminiState.confidence : 'medium';

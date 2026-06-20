@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Custom Game — Gesture Zone</title>
+  <link rel="stylesheet" href="creator.css">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- MediaPipe / Motion Tracking CDNs -->
+  <script src="engine/gemini.js"></script>
+  <script src="engine/optical.js"></script>
+  <script src="engine/movement.js"></script>
+
+  <style>
+    /* Full-screen game play override */
+    .play-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .fullscreen-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      z-index: 1;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .top-btn {
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.8rem;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(5px);
+      cursor: pointer;
+    }
+
+    .top-btn:hover {
+      border-color: var(--secondary-accent);
+      box-shadow: 0 0 10px var(--secondary-glow);
+      background: rgba(0, 229, 255, 0.1);
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #050505;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font-title);
+      letter-spacing: 3px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-top: 3px solid var(--secondary-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="play-container">
+    <!-- Navigation Overlay -->
+    <div class="top-bar">
+      <a href="lobby.html" class="top-btn">← Back to Lobby</a>
+      <button id="btn-play-camera" class="top-btn">Enable Camera</button>
+    </div>
+
+    <!-- Loading screen -->
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="spinner"></div>
+      <h3 id="loading-text">CONNECTING TO DATABASE...</h3>
+    </div>
+
+    <!-- Sandboxed game frame -->
+    <iframe id="game-frame" class="fullscreen-frame"></iframe>
+
+    <!-- Mini Camera overlay and telemetry panel (relative to full viewport) -->
+    <div class="sensor-overlay" id="sensor-overlay" style="display: none; bottom: 20px; left: 20px;">
+      <div class="camera-wrapper">
+        <video id="webcam-view" autoplay muted playsinline></video>
+      </div>
+      <div class="telemetry-panel">
+        <div class="telemetry-title">Gesture Telemetry</div>
+        <div class="telemetry-row"><span>Walking:</span><span id="tel-walk" class="tel-val val-false">FALSE</span></div>
+        <div class="telemetry-row"><span>Leaning:</span><span id="tel-lean" class="tel-val val-center">CENTER</span></div>
+        <div class="telemetry-row"><span>Pinch/Shoot:</span><span id="tel-shoot" class="tel-val val-false">FALSE</span></div>
+        <div class="telemetry-row"><span>Mouth Open:</span><span id="tel-mouth" class="tel-val val-false">FALSE</span></div>
+        <div class="telemetry-row"><span>Active Hands:</span><span id="tel-hands" class="tel-val val-none">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { database } from "./firebase-config.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const gameFrame = document.getElementById("game-frame");
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const loadingText = document.getElementById("loading-text");
+    const btnPlayCamera = document.getElementById("btn-play-camera");
+    const sensorOverlay = document.getElementById("sensor-overlay");
+
+    let movementController = null;
+    let cameraActive = false;
+
+    // Load game from database
+    async function loadCustomGame() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameId = urlParams.get("id");
+      if (!gameId) {
+        loadingText.textContent = "ERROR: INVALID GAME ID";
+        return;
+      }
+
+      try {
+        loadingText.textContent = "COMPILING SOURCE MATRIX...";
+        const gameSnapshot = await get(ref(database, `games/user_created/${gameId}`));
+        if (!gameSnapshot.exists()) {
+          loadingText.textContent = "ERROR: GAME NOT FOUND";
+          return;
+        }
+
+        const gameData = gameSnapshot.val();
+        document.title = `${gameData.name} — Gesture Zone`;
+        gameFrame.srcdoc = gameData.code;
+
+        // Wait for iframe load to hide loader
+        gameFrame.onload = () => {
+          loadingOverlay.style.display = "none";
+        };
+      } catch (err) {
+        console.error(err);
+        loadingText.textContent = `CRITICAL DEPLOYMENT FAILURE: ${err.message.toUpperCase()}`;
+      }
+    }
+
+    // Camera / Tracking loop
+    async function toggleCamera() {
+      if (!cameraActive) {
+        if (!movementController) {
+          movementController = new MovementController();
+          movementController.onUpdate((state) => {
+            // Update UI telemetry
+            const telWalk = document.getElementById("tel-walk");
+            const telLean = document.getElementById("tel-lean");
+            const telShoot = document.getElementById("tel-shoot");
+            const telMouth = document.getElementById("tel-mouth");
+            const telHands = document.getElementById("tel-hands");
+
+            telWalk.textContent = state.walking ? "TRUE" : "FALSE";
+            telWalk.className = `tel-val val-${state.walking}`;
+
+            telLean.textContent = state.lean.toUpperCase();
+            telLean.className = `tel-val val-${state.lean}`;
+
+            telShoot.textContent = state.shoot ? "TRUE" : "FALSE";
+            telShoot.className = `tel-val val-${state.shoot}`;
+
+            if (telMouth) {
+              telMouth.textContent = state.mouthOpen ? "TRUE" : "FALSE";
+              telMouth.className = `tel-val val-${state.mouthOpen}`;
+            }
+
+            const handsCount = movementController.handLandmarksList ? movementController.handLandmarksList.length : 0;
+            telHands.textContent = handsCount;
+            telHands.className = handsCount > 0 ? "tel-val val-true" : "tel-val val-none";
+
+            // Broadcast states
+            if (gameFrame.contentWindow) {
+              gameFrame.contentWindow.postMessage(state, "*");
+            }
+          });
+        }
+
+        const videoElement = document.getElementById("webcam-view");
+        const initSuccess = await movementController.initCamera(videoElement);
+        if (initSuccess) {
+          try {
+            await Promise.all([
+              movementController.loadMediaPipe(),
+              movementController.loadMediaPipeFaceMesh()
+            ]);
+            movementController.startProcessingLoop();
+
+            btnPlayCamera.textContent = "Disable Camera";
+            btnPlayCamera.style.borderColor = "var(--primary-accent)";
+            btnPlayCamera.style.color = "var(--primary-accent)";
+            sensorOverlay.style.display = "flex";
+            cameraActive = true;
+          } catch (e) {
+            console.error("MediaPipe failed:", e);
+          }
+        }
+      } else {
+        if (movementController && movementController.stream) {
+          movementController.stream.getTracks().forEach(track => track.stop());
+        }
+        btnPlayCamera.textContent = "Enable Camera";
+        btnPlayCamera.style.borderColor = "rgba(255,255,255,0.1)";
+        btnPlayCamera.style.color = "var(--text-primary)";
+        sensorOverlay.style.display = "none";
+        cameraActive = false;
+      }
+    }
+
+    btnPlayCamera.addEventListener("click", toggleCamera);
+    loadCustomGame();
+  </script>
+</body>
+</html>

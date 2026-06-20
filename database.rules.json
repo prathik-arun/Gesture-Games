@@ -23,6 +23,12 @@
         ".read": "true",
         ".write": "true"
       }
+    },
+    "games": {
+      "user_created": {
+        ".read": "true",
+        ".write": "auth !== null"
+      }
     }
   }
 }

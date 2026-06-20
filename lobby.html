@@ -91,6 +91,21 @@
     <div class="container">
       <h2 class="section-title">Games Lobby</h2>
       <div class="lobby-grid">
+        <!-- Glitch Game Creator (NEW AI Tool) -->
+        <div class="game-card theme-creator" style="border: 1px dashed var(--secondary-accent); background: rgba(0, 229, 255, 0.02);">
+          <div class="game-preview">
+            <span class="badge" style="background:#00e5ff; color:#000;">AI TOOL</span>
+            <div style="font-size: 5rem; text-align: center; padding: 20px 0;">⚡🤖</div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>AI Game Creator</h3>
+            <div class="game-meta">AI-Powered | Web Engine</div>
+            <p>Chat with <strong>Glitch</strong> to dynamically build your own custom gesture-controlled games in seconds using 3D Three.js or 2D canvas, playtest, and publish them!</p>
+            <a href="creator.html" class="btn" style="border-color:#00e5ff; color:#00e5ff;">Open Builder</a>
+          </div>
+        </div>
+
         <!-- Dead Zone (LIVE) -->
         <div class="game-card theme-deadzone">
           <div class="game-preview">
@@ -413,6 +428,44 @@
     });
   </script>
   <script type="module" src="auth-handler.js"></script>
+  <script type="module">
+    import { database } from "./firebase-config.js";
+    import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const lobbyGrid = document.querySelector(".lobby-grid");
+    if (lobbyGrid) {
+      const userGamesRef = ref(database, "games/user_created");
+      onValue(userGamesRef, (snapshot) => {
+        // Remove previous user created games to avoid duplicates
+        document.querySelectorAll(".game-card.user-created").forEach(el => el.remove());
+        
+        if (snapshot.exists()) {
+          const games = snapshot.val();
+          Object.keys(games).forEach(gameId => {
+            const game = games[gameId];
+            const card = document.createElement("div");
+            card.className = "game-card theme-breaker user-created";
+            card.style.borderColor = "#00ffcc";
+            
+            card.innerHTML = `
+              <div class="game-preview">
+                <span class="badge" style="background:#00ffcc; color:#000; font-weight: bold;">BY ${game.author.toUpperCase()}</span>
+                <img src="${game.thumbnail || 'assets/thumbnails/cyber_strike_3d_thumb.png'}" alt="${game.name}" class="game-cover-art">
+                <div class="game-glass-overlay"></div>
+              </div>
+              <div class="game-content">
+                <h3>${game.name}</h3>
+                <div class="game-meta">${game.engine} | Creator Game</div>
+                <p>${game.description || 'Custom gesture-controlled game created using Glitch.'}</p>
+                <a href="play-custom.html?id=${gameId}" class="btn" style="border-color:#00ffcc; color:#00ffcc;">Play Game</a>
+              </div>
+            `;
+            lobbyGrid.appendChild(card);
+          });
+        }
+      });
+    }
+  </script>
 
   <!-- Dynamic Grid Gravity Well & Interactive Constellation Canvas Script -->
   <script>
