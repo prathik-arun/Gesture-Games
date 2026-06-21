@@ -753,6 +753,7 @@ async function toggleCameraManual() {
     if (isArtist && gameStatus === "drawing") {
       const localVideo = document.getElementById("local-video");
       localVideo.srcObject = localStream;
+      localVideo.play().catch(e => console.error("[Charades] Local video play error:", e));
       localVideo.classList.remove("hidden");
       document.getElementById("remote-video").classList.add("hidden");
       document.getElementById("video-placeholder").classList.add("hidden");
@@ -802,6 +803,7 @@ async function setupWebRTCStream() {
 
     const localVideo = document.getElementById("local-video");
     localVideo.srcObject = localStream;
+    localVideo.play().catch(e => console.error("[Charades] Local video play error:", e));
 
     // Negotiate connection to every other player in lobby
     const onlineGuessers = Object.keys(players).filter(pId => pId !== myPlayerId && players[pId].online);
@@ -939,6 +941,7 @@ async function setupWebRTCStream() {
           }
           remoteVideo.srcObject.addTrack(event.track);
         }
+        remoteVideo.play().catch(e => console.error("[WebRTC] Remote video play error:", e));
         document.getElementById("video-placeholder").classList.add("hidden");
         
         rtcStateEl.innerText = "Receiving";
