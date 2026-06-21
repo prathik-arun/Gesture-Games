@@ -817,6 +817,10 @@ async function setupWebRTCStream() {
       });
       peerConnections[guesserId] = pc;
 
+      // ICE Candidate buffering state
+      const pendingCandidates = [];
+      let isRemoteDescriptionSet = false;
+
       // Add camera tracks
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
 
@@ -853,7 +857,17 @@ async function setupWebRTCStream() {
           const answer = snapshot.val();
           if (answer && pc.signalingState === "have-local-offer") {
             console.log(`[WebRTC] Received answer from guesser ${guesserId}`);
-            await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            try {
+              await pc.setRemoteDescription(new RTCSessionDescription(answer));
+              isRemoteDescriptionSet = true;
+              console.log(`[WebRTC] Remote description set for guesser ${guesserId}. Processing ${pendingCandidates.length} pending candidates.`);
+              while (pendingCandidates.length > 0) {
+                const cand = pendingCandidates.shift();
+                await pc.addIceCandidate(cand);
+              }
+            } catch (err) {
+              console.error(`[WebRTC] Error setting remote description or adding buffered candidates for ${guesserId}:`, err);
+            }
           }
         });
         webrtcListeners.push(() => ansListener);
@@ -864,9 +878,15 @@ async function setupWebRTCStream() {
           const val = snapshot.val();
           if (val && val.candidate) {
             try {
-              await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(val.candidate)));
+              const candidate = new RTCIceCandidate(JSON.parse(val.candidate));
+              if (isRemoteDescriptionSet) {
+                await pc.addIceCandidate(candidate);
+              } else {
+                console.log(`[WebRTC] Buffering remote candidate from guesser ${guesserId}`);
+                pendingCandidates.push(candidate);
+              }
             } catch (e) {
-              console.error(e);
+              console.error(`[WebRTC] Error processing remote candidate from ${guesserId}:`, e);
             }
           }
         });
@@ -902,11 +922,23 @@ async function setupWebRTCStream() {
       });
       actorPc = pc;
 
+      // ICE Candidate buffering state
+      const pendingCandidates = [];
+      let isRemoteDescriptionSet = false;
+
       // Handle incoming stream tracks
       pc.ontrack = (event) => {
-        console.log("[WebRTC] Received remote stream track!");
+        console.log("[WebRTC] Received remote stream track!", event);
         const remoteVideo = document.getElementById("remote-video");
-        remoteVideo.srcObject = event.streams[0];
+        if (event.streams && event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+        } else {
+          console.log("[WebRTC] No stream found in event. Constructing MediaStream from track.");
+          if (!remoteVideo.srcObject) {
+            remoteVideo.srcObject = new MediaStream();
+          }
+          remoteVideo.srcObject.addTrack(event.track);
+        }
         document.getElementById("video-placeholder").classList.add("hidden");
         
         rtcStateEl.innerText = "Receiving";
@@ -920,8 +952,26 @@ async function setupWebRTCStream() {
         }
       };
 
+      pc.oniceconnectionstatechange = () => {
+        console.log(`[WebRTC] ICE connection state with actor: ${pc.iceConnectionState}`);
+        if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") {
+          rtcStateEl.innerText = "Connected";
+          rtcStateEl.className = "status-val connected";
+        } else if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
+          rtcStateEl.innerText = "Disconnected";
+          rtcStateEl.className = "status-val idle";
+        }
+      };
+
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        isRemoteDescriptionSet = true;
+        console.log(`[WebRTC] Remote description set for actor Pc. Processing ${pendingCandidates.length} pending candidates.`);
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          await pc.addIceCandidate(cand);
+        }
+
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
 
@@ -936,9 +986,15 @@ async function setupWebRTCStream() {
           const val = snap.val();
           if (val && val.candidate) {
             try {
-              await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(val.candidate)));
+              const candidate = new RTCIceCandidate(JSON.parse(val.candidate));
+              if (isRemoteDescriptionSet) {
+                await pc.addIceCandidate(candidate);
+              } else {
+                console.log(`[WebRTC] Buffering remote candidate from actor`);
+                pendingCandidates.push(candidate);
+              }
             } catch (e) {
-              console.error(e);
+              console.error(`[WebRTC] Error adding actor candidate:`, e);
             }
           }
         });

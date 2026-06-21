@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scream Detector — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&family=Courier+Prime&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Neon grid background effect -->
+    <div class="neon-grid"></div>
+    <div class="vignette"></div>
+
+    <!-- Back to Lobby link -->
+    <a href="../../lobby.html" class="back-to-lobby">← Lobby</a>
+
+    <!-- Page 1: Calibration / Setup Screen -->
+    <div id="setup-screen" class="screen-layout">
+      <div class="glass-card setup-card">
+        <h1 class="game-title">SCREAM DETECTOR</h1>
+        <p class="game-subtitle">Test your vocal cords, calibrate your sensors, and snap hilarious reaction shots!</p>
+
+        <div class="setup-layout">
+          <!-- Left side: Live Webcam & Mic test -->
+          <div class="setup-preview-panel">
+            <div class="camera-wrapper">
+              <video id="setup-webcam" autoplay muted playsinline></video>
+              <div id="camera-status-overlay" class="camera-status-overlay">
+                <span>📷 Camera Stream Off</span>
+              </div>
+            </div>
+            
+            <div class="sensor-test-container">
+              <div class="sensor-status">
+                <span class="status-label">MICROPHONE</span>
+                <span id="mic-status-badge" class="status-value val-false">DISCONNECTED</span>
+              </div>
+              <div class="mic-level-track">
+                <div id="mic-level-bar" class="mic-level-fill"></div>
+              </div>
+              <div class="mic-hint-text">Make some noise to test the mic level.</div>
+            </div>
+          </div>
+
+          <!-- Right side: Steps -->
+          <div class="setup-steps-panel">
+            <h3>PERMISSIONS REQUIRED</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+              This game runs entirely in your browser. Audio level tracking and camera snapshot processing happen locally—no data is sent to a server.
+            </p>
+
+            <div class="steps-list">
+              <div id="step-camera" class="step-item">
+                <div class="step-icon">📸</div>
+                <div class="step-details">
+                  <div class="step-title">Webcam Access</div>
+                  <div class="step-desc">Allows capturing your epic scream reactions.</div>
+                </div>
+                <div id="indicator-camera" class="step-status-indicator error">●</div>
+              </div>
+
+              <div id="step-mic" class="step-item">
+                <div class="step-icon">🎤</div>
+                <div class="step-details">
+                  <div class="step-title">Microphone Access</div>
+                  <div class="step-desc">Used to measure your sound level (decibels).</div>
+                </div>
+                <div id="indicator-mic" class="step-status-indicator error">●</div>
+              </div>
+            </div>
+
+            <button id="btn-request-access" class="btn primary-glow">Grant Media Permissions</button>
+          </div>
+        </div>
+
+        <div class="setup-actions">
+          <button id="btn-start-game" class="btn action-btn font-orbitron" disabled>ENTER THE ARENA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 2: Scream Screen -->
+    <div id="scream-screen" class="screen-layout" style="display: none;">
+      <!-- Vertical volume/scream level bars on the sides -->
+      <div class="level-meter-container left-side">
+        <div class="meter-labels">
+          <span>120 dB</span>
+          <span>100 dB</span>
+          <span>80 dB</span>
+          <span>60 dB</span>
+          <span>40 dB</span>
+        </div>
+        <div class="meter-track">
+          <div id="left-volume-bar" class="meter-fill"></div>
+        </div>
+      </div>
+
+      <div class="level-meter-container right-side">
+        <div class="meter-labels">
+          <span>120 dB</span>
+          <span>100 dB</span>
+          <span>80 dB</span>
+          <span>60 dB</span>
+          <span>40 dB</span>
+        </div>
+        <div class="meter-track">
+          <div id="right-volume-bar" class="meter-fill"></div>
+        </div>
+      </div>
+
+      <!-- Centered Neon microphone & control -->
+      <div class="scream-center-panel">
+        <div id="instructions-box" class="instructions-bubble font-orbitron">
+          CLICK MICROPHONE TO SCREAM
+        </div>
+
+        <!-- Neon microphone styling -->
+        <button id="scream-mic-btn" class="scream-mic-button">
+          <!-- Multi-colored segment ring -->
+          <div class="scream-mic-ring">
+            <div class="ring-segment pink"></div>
+            <div class="ring-segment cyan"></div>
+            <div class="ring-segment orange"></div>
+            <div class="ring-segment purple"></div>
+          </div>
+          <!-- Centered micro icon -->
+          <div class="mic-inner-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+            </svg>
+          </div>
+        </button>
+
+        <div class="scream-stats-container">
+          <div class="scream-stat-box">
+            <span class="scream-stat-label">LIVE LEVEL</span>
+            <span id="live-decibels" class="scream-stat-value">30 <span class="unit">dB</span></span>
+          </div>
+          
+          <div class="scream-stat-box highlight">
+            <span class="scream-stat-label">PEAK LEVEL</span>
+            <span id="peak-decibels" class="scream-stat-value text-red">-- <span class="unit">dB</span></span>
+          </div>
+        </div>
+
+        <!-- Countdown / Session Timer -->
+        <div id="scream-timer-container" style="visibility: hidden;">
+          <div class="scream-timer-bar">
+            <div id="scream-timer-fill" class="scream-timer-fill"></div>
+          </div>
+          <div id="scream-timer-text" class="scream-timer-text font-orbitron">SCREAM FOR: 3.0s</div>
+        </div>
+      </div>
+
+      <!-- Miniature Webcam Inset -->
+      <div id="camera-inset-container">
+        <video id="game-webcam" autoplay muted playsinline></video>
+        <div class="camera-label font-orbitron">
+          <span class="record-dot animate-pulse"></span> REC SENSOR
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 3: Results Screen -->
+    <div id="results-screen" class="screen-layout" style="display: none;">
+      <div class="glass-card results-card">
+        <h2 class="results-header font-orbitron">SCREAM ANALYSIS</h2>
+        
+        <div class="results-data">
+          <!-- Giant Decibel Score -->
+          <div class="score-display">
+            <div id="final-score" class="final-score-val font-orbitron animate-glow">0</div>
+            <div class="final-score-lbl font-orbitron">DECIBELS REACHED</div>
+          </div>
+
+          <!-- Vocal Rating / Classification Card -->
+          <div class="rating-badge-container">
+            <div id="rating-badge" class="rating-badge font-orbitron">MUTED WHISPER 🤫</div>
+            <p id="rating-desc" class="rating-desc">Did you make any sound at all? Try screaming with some passion!</p>
+          </div>
+        </div>
+
+        <!-- Snapshot Gallery (Top Pics taken during screaming) -->
+        <div class="gallery-section">
+          <h3 class="gallery-title font-orbitron">TOP REACTION SHOTS</h3>
+          <div id="photo-gallery" class="photo-gallery-grid">
+            <!-- Dynamically populated cards with polaroid styling -->
+            <div class="photo-placeholder-card">
+              <span class="placeholder-icon">📸</span>
+              <span>No snapshots taken. Try screaming louder!</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-actions">
+          <button id="btn-retry" class="btn font-orbitron style-retry">SCREAM AGAIN 💥</button>
+          <a href="../../lobby.html" class="btn font-orbitron style-lobby">LOBBY</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Game Script -->
+  <script src="game.js"></script>
+</body>
+</html>

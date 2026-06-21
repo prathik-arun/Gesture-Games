@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doors: The Castle — Gesture Zone</title>
+  <script>
+    window.addEventListener('error', function(e) {
+      var errDiv = document.createElement('div');
+      errDiv.style.position = 'fixed';
+      errDiv.style.top = '10px';
+      errDiv.style.left = '10px';
+      errDiv.style.width = 'calc(100% - 40px)';
+      errDiv.style.backgroundColor = 'rgba(200, 0, 0, 0.95)';
+      errDiv.style.color = '#fff';
+      errDiv.style.padding = '15px';
+      errDiv.style.zIndex = '999999';
+      errDiv.style.fontFamily = 'monospace';
+      errDiv.style.fontSize = '14px';
+      errDiv.style.borderRadius = '5px';
+      errDiv.style.boxShadow = '0 0 15px rgba(0,0,0,0.5)';
+      errDiv.style.overflow = 'auto';
+      errDiv.style.maxHeight = '200px';
+      errDiv.innerHTML = '<strong>[JS ERROR]</strong> ' + e.message + '<br><small>at ' + e.filename + ':' + e.lineno + ':' + e.colno + '</small>';
+      document.body.appendChild(errDiv);
+    });
+  </script>
+  <link rel="stylesheet" href="style.css?v=1.0.3">
+  
+  <!-- Typography for Gothic / Dark Fantasy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Include Three.js for 3D Graphics -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- MediaPipe Libraries for Custom Face and Hand Tracking -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Horror atmosphere overlays -->
+    <div class="vignette"></div>
+    <div id="damage-flash"></div>
+    <div id="jumpscare-container" style="display: none;">
+      <div id="jumpscare-monster"></div>
+    </div>
+    <div id="hiding-overlay" class="hidden-screen">
+      <div class="hiding-slits"></div>
+      <div class="hiding-prompt">HIDDEN IN WARDROBE</div>
+      <div class="hiding-sub">Pinch / Press E to Exit</div>
+    </div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" id="btn-back-lobby" onclick="window.location.href='../../lobby.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Interactive Hand Cursor Reticle -->
+    <div id="hand-cursor" class="hand-reticle" style="display: none;">
+      <div class="reticle-ring"></div>
+      <div class="reticle-dot"></div>
+      <div class="reticle-label">PINCH TO INTERACT</div>
+    </div>
+
+    <!-- Center HUD crosshair for look-based targeting (mouse) -->
+    <div id="crosshair"></div>
+
+    <!-- Active Gothic HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel gothic-panel">
+          <div class="stat-row">
+            <span class="stat-label">VITALS:</span>
+            <div class="progress-bar-bg vial-bg">
+              <div id="health-bar-fill" class="vial-fill health-fill"></div>
+            </div>
+            <span id="health-val" class="stat-num">100</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">LIGHTER:</span>
+            <div class="progress-bar-bg fuel-bg">
+              <div id="lighter-bar-fill" class="fuel-fill"></div>
+            </div>
+            <span id="lighter-val" class="stat-num">100%</span>
+          </div>
+          <div class="stat-row stance-row">
+            <span class="stat-label">STANCE:</span>
+            <span id="stance-val" class="stance-state standing">STANDING</span>
+          </div>
+          <div class="stat-row" id="noise-row">
+            <span class="stat-label">NOISE:</span>
+            <div class="progress-bar-bg noise-bg">
+              <div id="noise-bar-fill" class="noise-fill"></div>
+            </div>
+            <span id="noise-val" class="stat-num text-gray">SILENT</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel gothic-panel">
+          <div class="hud-metric"><span class="metric-lbl">ROOM</span> <span id="hud-room" class="metric-val text-red">I</span></div>
+          <div class="hud-metric"><span class="metric-lbl">GOLD</span> <span id="hud-gold" class="metric-val text-gold">0</span></div>
+          <div class="hud-metric" id="key-indicator" style="opacity: 0.3;">🔑 <span id="hud-keys" class="metric-val">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Interaction Prompts -->
+    <div id="interaction-prompt" style="display: none;">
+      <span class="prompt-key">E</span> <span class="prompt-text">Open Chest</span>
+    </div>
+
+    <!-- Big Center Announcements -->
+    <div id="announcement">ROOM 1</div>
+    <div id="sub-announcement">Flicker... Flicker...</div>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title gothic-title">DOORS</h1>
+      <h2 class="game-subtitle">THE CASTLE</h2>
+      <p class="game-desc">A subterranean Gothic horror roguelite. Escape Room 50 by navigating dark hallways, looting chests for keys and gold, and surviving terrifying ancient entities using your physical body movements.</p>
+      
+      <div class="control-expl gothic-expl">
+        <div class="expl-header">Physical Body Gestures</div>
+        <div class="expl-grid">
+          <div class="expl-item"><strong>JOG IN PLACE</strong><span>Walk forward in the castle</span></div>
+          <div class="expl-item"><strong>TURN HEAD/BODY L/R</strong><span>Steer character left or right</span></div>
+          <div class="expl-item"><strong>PHYSICAL CROUCH</strong><span>Duck down to dodge and sneak silently</span></div>
+          <div class="expl-item"><strong>AIR RETICLE PINCH</strong><span>Raise hand to steer reticle, pinch fingers to open chests, drawers, wardrobes and pick up keys</span></div>
+        </div>
+        <div class="fallback-note">Keyboard Fallback: WASD to move, Mouse to look/steer, C to crouch, E/Click to interact, F to toggle Lighter.</div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn gothic-btn">Begin Calibration</button>
+      <button id="btn-skip-calibration" class="btn gothic-btn" style="margin-top: 12px; background: rgba(30, 20, 20, 0.6); border: 1px solid #5a2e28;">Play with Keyboard Fallback</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box gothic-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2 class="gothic-header">SENSORS CALIBRATION</h2>
+              <p>Position your camera and align your body before venturing into the deep.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Authorize Camera</div>
+                  <div class="step-desc">Enable webcam access to track your body.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn gothic-btn btn-small">Enable</button>
+                  <div class="step-indicator">I</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Stand Still (Align Baseline)</div>
+                  <div class="step-desc">Stand 4-6 ft back and remain still for 3 seconds.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">II</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Jog In Place (Test Walking)</div>
+                  <div class="step-desc">Jog or march in place to test forward movement.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">III</div>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div id="step-4" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">4. Turn Head L/R (Test Steering)</div>
+                  <div class="step-desc">Turn head slightly left, then right, to calibrate turning.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-4-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">IV</div>
+                </div>
+              </div>
+
+              <!-- Step 5 -->
+              <div id="step-5" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">5. Crouch and Pinch (Test Controls)</div>
+                  <div class="step-desc">Crouch down physically, then step closer and pinch fingers to test interaction.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-5-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">V</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Motion Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display gothic-status">
+              <div class="status-indicator-box">
+                <span class="status-label">WALK (BOB)</span>
+                <span id="stat-walk" class="status-value val-false">NO</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">STEERING</span>
+                <span id="stat-steer" class="status-value val-center">CENTER</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">HEIGHT</span>
+                <span id="stat-height" class="status-value val-normal">STANDING</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">PINCH</span>
+                <span id="stat-pinch" class="status-value val-none">NO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn gothic-btn btn-large" disabled>Enter Castle</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="screen-overlay" style="display: none;">
+      <h1 class="gothic-title text-red">YOU PERISHED</h1>
+      <p class="gameover-reason" id="game-over-text">Consumed by the entities lurking in Room 14.</p>
+      
+      <div class="gameover-stats gothic-stats-panel">
+        <div class="gameover-stat-row"><span>ROOMS SURVIVED:</span> <span id="go-rooms" class="text-red">0</span></div>
+        <div class="gameover-stat-row"><span>GOLD COLLECTED:</span> <span id="go-gold" class="text-gold">0</span></div>
+      </div>
+
+      <button id="btn-restart" class="btn gothic-btn">Retry Descent</button>
+    </div>
+
+    <!-- Game Completed / Win Overlay -->
+    <div id="win-overlay" class="screen-overlay" style="display: none;">
+      <h1 class="gothic-title text-gold">ESCAPED!</h1>
+      <p class="win-desc">You successfully solved the Great Library code and escaped the Warden's domain.</p>
+      
+      <div class="gameover-stats gothic-stats-panel">
+        <div class="gameover-stat-row"><span>FINAL GOLD SCORE:</span> <span id="win-gold" class="text-gold">0</span></div>
+        <div class="gameover-stat-row"><span>TIME ELAPSED:</span> <span id="win-time">0:00</span></div>
+      </div>
+
+      <button id="btn-win-restart" class="btn gothic-btn">Play Again</button>
+    </div>
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Monitor</div>
+      <div class="direction-indicators">
+        <span id="ind-left" class="dir-indicator">◀ STEER LEFT</span>
+        <span id="ind-walk" class="dir-indicator">▲ JOGGING</span>
+        <span id="ind-right" class="dir-indicator">STEER RIGHT ▶</span>
+        <span id="ind-crouch" class="dir-indicator">▼ CROUCHED</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Sensor Monitor</div>
+      <div class="debug-row"><span>Tracking Status:</span><span id="dbg-tracking" class="debug-val">inactive</span></div>
+      <div class="debug-row"><span>Head Y-Bob Amp:</span><span id="dbg-y-bob" class="debug-val">0.00</span></div>
+      <div class="debug-row"><span>Head Yaw (L/R):</span><span id="dbg-yaw" class="debug-val">0.00</span></div>
+      <div class="debug-row"><span>Head Rel Height:</span><span id="dbg-height" class="debug-val">1.00</span></div>
+      <div class="debug-row"><span>Hand Pinch Dist:</span><span id="dbg-pinch" class="debug-val">1.00</span></div>
+      <div class="debug-row"><span>Action state:</span><span id="dbg-action" class="debug-val">none</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic -->
+  <script src="game.js?v=1.0.3"></script>
+</body>
+</html>
