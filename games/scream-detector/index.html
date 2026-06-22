@@ -200,11 +200,39 @@
 
         <div class="results-actions">
           <button id="btn-retry" class="btn font-orbitron style-retry">SCREAM AGAIN 💥</button>
+          <button id="btn-share-instagram" class="btn font-orbitron style-share">SHARE STORY 📸</button>
           <a href="../../lobby.html" class="btn font-orbitron style-lobby">LOBBY</a>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Share Story Modal -->
+  <div id="share-modal" class="modal-backdrop" style="display: none;">
+    <div class="glass-card modal-card">
+      <div class="modal-header">
+        <h3 class="font-orbitron">SHARE YOUR SCREAM</h3>
+        <button id="btn-close-modal" class="modal-close-btn">&times;</button>
+      </div>
+      <p class="modal-subtitle">Here is your custom Instagram Story card! Save or share it directly.</p>
+      
+      <div class="modal-content">
+        <div class="story-preview-wrapper">
+          <div id="story-loading-spinner" class="spinner-overlay">
+            <div class="spinner"></div>
+            <span class="loading-text font-orbitron">GENERATING CARD...</span>
+          </div>
+          <img id="story-preview-img" src="" alt="Instagram Story Preview" style="display: none;">
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button id="btn-download-story" class="btn font-orbitron style-download" disabled>Download 📥</button>
+        <button id="btn-native-share" class="btn font-orbitron style-native-share" style="display: none;" disabled>Share 📤</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Main Game Script -->
   <script src="game.js"></script>

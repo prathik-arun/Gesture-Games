@@ -111,6 +111,13 @@ header {
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
+.back-btn.active {
+  border-color: var(--primary-accent);
+  background: rgba(255, 0, 204, 0.15);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
 /* Main Container */
 main {
   flex-grow: 1;
@@ -893,7 +900,7 @@ main {
 /* Instructions Grid Styles */
 .instructions-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 0.5rem;
 }

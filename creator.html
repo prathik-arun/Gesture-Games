@@ -32,9 +32,14 @@
 
     <!-- Main Workspace Layout -->
     <main class="workspace">
+      <!-- Workspace tabs switcher for mobile/tablet screens -->
+      <div class="workspace-tabs">
+        <button class="w-tab-btn active" data-target="chat">Glitch Chat</button>
+        <button class="w-tab-btn" data-target="preview">Playtest Sandbox</button>
+      </div>
       
       <!-- Left Pane: Glitch AI Chatbot -->
-      <section class="pane chat-pane">
+      <section class="pane chat-pane active">
         <div class="pane-header">
           <div class="glitch-avatar">
             <img src="assets/logo.png" alt="Glitch Mascot" class="glitch-avatar-img">

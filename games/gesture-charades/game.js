@@ -872,7 +872,7 @@ async function setupWebRTCStream() {
             }
           }
         });
-        webrtcListeners.push(() => ansListener);
+        webrtcListeners.push(ansListener);
 
         // Listen for remote candidates
         const candRef = ref(database, `rooms/${roomId}/signals/${guesserId}/guesserCandidates`);
@@ -892,7 +892,7 @@ async function setupWebRTCStream() {
             }
           }
         });
-        webrtcListeners.push(() => candListener);
+        webrtcListeners.push(candListener);
 
       } catch (err) {
         console.error("Error creating WebRTC offer:", err);
@@ -1001,13 +1001,13 @@ async function setupWebRTCStream() {
             }
           }
         });
-        webrtcListeners.push(() => actCandListener);
+        webrtcListeners.push(actCandListener);
 
       } catch (err) {
         console.error("WebRTC answering error:", err);
       }
     });
-    webrtcListeners.push(() => offerListener);
+    webrtcListeners.push(offerListener);
   }
 }
 

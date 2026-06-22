@@ -262,6 +262,9 @@ async function triggerCompilation() {
     gameFrame.style.display = "block";
     gameFrame.srcdoc = data.html;
 
+    // Auto-switch to Playtest Sandbox tab on mobile/tablet viewports
+    switchWorkspaceTab("preview");
+
     previewGameName.textContent = creatorState.name;
     btnPublishGame.disabled = false;
     btnRunAgent.disabled = false;
@@ -311,6 +314,10 @@ async function triggerIterativeUpdate(userPrompt) {
     logConsole("Re-compilation complete! Refreshing preview...", "success");
     creatorState.currentCode = data.html;
     gameFrame.srcdoc = data.html;
+
+    // Auto-switch to Playtest Sandbox tab on mobile/tablet viewports
+    switchWorkspaceTab("preview");
+
     btnRunAgent.disabled = false;
 
     typingIndicator.style.display = "none";
@@ -1258,8 +1265,37 @@ btnConfirmPublish.addEventListener("click", async () => {
   }
 });
 
+// Helper to switch workspace tabs programmatically on mobile/tablet
+function switchWorkspaceTab(tabName) {
+  const btn = document.querySelector(`.w-tab-btn[data-target="${tabName}"]`);
+  if (btn) {
+    btn.click();
+  }
+}
+
 // Setup welcome screen bubble
 window.addEventListener("DOMContentLoaded", () => {
+  // Mobile / Tablet Tab switching logic
+  const workspaceTabs = document.querySelectorAll(".w-tab-btn");
+  const chatPane = document.querySelector(".chat-pane");
+  const previewPane = document.querySelector(".preview-pane");
+
+  workspaceTabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      workspaceTabs.forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      
+      const target = btn.getAttribute("data-target");
+      if (target === "chat") {
+        chatPane.classList.add("active");
+        previewPane.classList.remove("active");
+      } else {
+        previewPane.classList.add("active");
+        chatPane.classList.remove("active");
+      }
+    });
+  });
+
   appendMessage("glitch", welcomeText);
   chatHistory.push({ sender: 'glitch', text: welcomeText });
   logConsole("Node workspace online. Dynamic design session initialized.");

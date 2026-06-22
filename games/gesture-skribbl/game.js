@@ -162,6 +162,20 @@ function setupToolbarEvents() {
       currentColor = swatch.getAttribute("data-color");
       currentMode = "draw"; // Switch to draw mode when clicking color
       
+      // Update Pen/Eraser active states
+      const penBtn = document.getElementById("btn-pen-tool");
+      const eraserBtn = document.getElementById("btn-eraser-tool");
+      if (penBtn) {
+        penBtn.classList.add("active");
+        penBtn.style.backgroundColor = "rgba(255, 0, 204, 0.15)";
+        penBtn.style.borderColor = "var(--primary-accent)";
+      }
+      if (eraserBtn) {
+        eraserBtn.classList.remove("active");
+        eraserBtn.style.backgroundColor = "transparent";
+        eraserBtn.style.borderColor = "rgba(241, 196, 15, 0.3)";
+      }
+
       // Update cursor indicator
       const cursor = document.getElementById("brush-cursor");
       cursor.className = "brush-cursor";
@@ -185,9 +199,63 @@ function setupToolbarEvents() {
     clearCanvasOnDatabase();
   });
 
+  // Pen Tool Button
+  const penBtn = document.getElementById("btn-pen-tool");
+  if (penBtn) {
+    penBtn.addEventListener("click", () => {
+      currentMode = "draw";
+      
+      const penBtn = document.getElementById("btn-pen-tool");
+      const eraserBtn = document.getElementById("btn-eraser-tool");
+      penBtn.classList.add("active");
+      penBtn.style.backgroundColor = "rgba(255, 0, 204, 0.15)";
+      penBtn.style.borderColor = "var(--primary-accent)";
+      
+      if (eraserBtn) {
+        eraserBtn.classList.remove("active");
+        eraserBtn.style.backgroundColor = "transparent";
+        eraserBtn.style.borderColor = "rgba(241, 196, 15, 0.3)";
+      }
+
+      // Select active color swatch or default
+      const swatches = document.querySelectorAll(".color-swatch");
+      let activeSwatch = null;
+      swatches.forEach(s => {
+        if (s.getAttribute("data-color") === currentColor) {
+          s.classList.add("active");
+          activeSwatch = s;
+        } else {
+          s.classList.remove("active");
+        }
+      });
+      if (!activeSwatch && swatches.length > 0) {
+        swatches[0].classList.add("active");
+        currentColor = swatches[0].getAttribute("data-color");
+      }
+
+      // Update cursor indicator
+      const cursor = document.getElementById("brush-cursor");
+      cursor.className = "brush-cursor";
+      cursor.style.borderColor = currentColor;
+    });
+  }
+
   // Eraser Tool Button
   document.getElementById("btn-eraser-tool").addEventListener("click", () => {
     currentMode = "erase";
+    
+    const penBtn = document.getElementById("btn-pen-tool");
+    const eraserBtn = document.getElementById("btn-eraser-tool");
+    eraserBtn.classList.add("active");
+    eraserBtn.style.backgroundColor = "rgba(241, 196, 15, 0.15)";
+    eraserBtn.style.borderColor = "var(--warning)";
+    
+    if (penBtn) {
+      penBtn.classList.remove("active");
+      penBtn.style.backgroundColor = "transparent";
+      penBtn.style.borderColor = "rgba(255, 0, 204, 0.3)";
+    }
+    
     // De-activate all color swatches
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach(s => s.classList.remove("active"));
@@ -1353,28 +1421,20 @@ function runGestureDrawingLoop() {
       normalizedTipDist = tipDist / handSize;
 
       // Classify Gestures:
-      // 1. Open Palm to Erase: Index, Middle, Ring, Pinky extended
-      if (indexExtended && middleExtended && ringExtended && pinkyExtended) {
-        isEraseGesture = true;
-      }
-      // 2. Peace/V Shape (separated) -> Hover; Closed Fingers (touching) -> Draw
-      else if (indexExtended && middleExtended) {
-        if (normalizedTipDist < 0.38) {
+      const indexPointed = indexExtended && !middleExtended && !ringExtended && !pinkyExtended;
+
+      if (indexPointed) {
+        if (currentMode === "draw") {
           isDrawGesture = true;
-        } else {
-          isHoverGesture = true;
+        } else if (currentMode === "erase") {
+          isEraseGesture = true;
         }
-      }
-      // 3. Fallback / fist / any other shape: Hover without drawing
-      else {
+      } else {
         isHoverGesture = true;
       }
 
-      // Select cursor tracking point: use index tip for drawing/erasing/hovering when index is extended
+      // Select cursor tracking point: use index tip always to prevent cursor jumps
       let trackPoint = indexTip;
-      if (!indexExtended) {
-        trackPoint = hand[9]; // middle finger MCP knuckle
-      }
 
       // Map coordinates to virtual canvas resolution (800x500)
       const targetX = (1 - trackPoint.x) * canvas.width;
@@ -1421,7 +1481,7 @@ function runGestureDrawingLoop() {
           }
         } 
         else if (isEraseGesture) {
-          // Open Palm -> Erase Mode
+          // Point -> Erase Mode
           cursor.className = "brush-cursor erase";
           cursor.style.borderColor = "var(--warning)";
           
@@ -1437,9 +1497,9 @@ function runGestureDrawingLoop() {
           }
         } 
         else {
-          // Fist or Hover gesture -> Move pointer without drawing
-          cursor.className = "brush-cursor";
-          cursor.style.borderColor = currentColor;
+          // Fist or other gesture -> Move pointer without drawing
+          cursor.className = currentMode === "erase" ? "brush-cursor erase" : "brush-cursor";
+          cursor.style.borderColor = currentMode === "erase" ? "var(--warning)" : currentColor;
           isDrawing = false;
         }
       }
@@ -1451,9 +1511,9 @@ function runGestureDrawingLoop() {
     }
 
     // Sync badges style active
+    const isAction = isDrawGesture || isEraseGesture;
     document.getElementById("badge-hover").className = `gesture-badge ${isHoverGesture ? 'active' : ''}`;
-    document.getElementById("badge-draw").className = `gesture-badge ${isDrawGesture ? 'active' : ''}`;
-    document.getElementById("badge-erase").className = `gesture-badge ${isEraseGesture ? 'active' : ''}`;
+    document.getElementById("badge-action").className = `gesture-badge ${isAction ? 'active' : ''}`;
 
     // Update Finger Gap value
     document.getElementById("sensor-pinch-val").innerText = normalizedTipDist !== null ? normalizedTipDist.toFixed(3) : "----";

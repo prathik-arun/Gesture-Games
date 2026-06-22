@@ -390,23 +390,23 @@ class CyberBird {
     this.wingAngle = 0;
   }
   
-  update(mouthOpen) {
+  update(mouthOpen, dt) {
     // Apply forces
     const isLifting = mouthOpen || keyboardFlap || isMouseDown;
     
     if (isLifting) {
       // Accelerate upward
-      this.vy = Math.max(PHYSICS.maxRise, this.vy - PHYSICS.lift);
+      this.vy = Math.max(PHYSICS.maxRise, this.vy - PHYSICS.lift * dt);
       // Play flap audio occasionally
-      if (Math.random() < 0.12) {
+      if (Math.random() < 0.12 * dt) {
         sounds.playFlap();
       }
     } else {
       // Accelerate downward
-      this.vy = Math.min(PHYSICS.maxFall, this.vy + PHYSICS.gravity);
+      this.vy = Math.min(PHYSICS.maxFall, this.vy + PHYSICS.gravity * dt);
     }
     
-    this.y += this.vy;
+    this.y += this.vy * dt;
     
     // Bounds clamping
     if (this.y < this.r + 10) {
@@ -422,7 +422,7 @@ class CyberBird {
     this.angle = Math.max(-Math.PI/6, Math.min(Math.PI/3, this.vy * 0.08));
     
     // Flapping wings animation speed scales with velocity
-    this.wingAngle += isLifting ? 0.35 : 0.12;
+    this.wingAngle += (isLifting ? 0.35 : 0.12) * dt;
   }
   
   draw(gCtx) {
@@ -499,8 +499,8 @@ class ObstaclePipe {
     this.speed = 3.2;
   }
   
-  update() {
-    this.x -= this.speed;
+  update(dt) {
+    this.x -= this.speed * dt;
   }
   
   draw(gCtx) {
@@ -571,10 +571,10 @@ class DustParticle {
     this.decay = 0.015 + Math.random() * 0.02;
   }
   
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.alpha -= this.decay;
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.alpha -= this.decay * dt;
   }
   
   draw(gCtx) {
@@ -665,7 +665,7 @@ function triggerAnnouncement(txt, duration = 90) {
 // ----------------------------------------------------
 // Sensor Validation Calibration Loop
 // ----------------------------------------------------
-function updateOnboarding() {
+function updateOnboarding(dt) {
   const active = window.MovementController.isFaceMeshLoaded;
   if (statAiConnected) {
     statAiConnected.innerText = active ? 'CONNECTED' : 'WAITING...';
@@ -696,7 +696,7 @@ function updateOnboarding() {
   // Calibration Step calculations
   if (onboarding.currentStep === 3) {
     if (mouthOpen) {
-      onboarding.step3Progress = Math.min(onboarding.step3Progress + 2.0, 100);
+      onboarding.step3Progress = Math.min(onboarding.step3Progress + 2.0 * dt, 100);
       document.getElementById('step-3-progress').style.width = `${onboarding.step3Progress}%`;
     }
     
@@ -808,11 +808,20 @@ function drawCalibrationOverlay() {
 // ----------------------------------------------------
 // Main Game Update and Render Loop
 // ----------------------------------------------------
+let lastFrameTime = performance.now();
 let lastTime = performance.now();
 let frameCount = 0;
 
 function runLoop() {
   const now = performance.now();
+  
+  // Calculate delta time (normalized to 60 FPS baseline)
+  const deltaTime = (now - lastFrameTime) / 16.67;
+  lastFrameTime = now;
+  
+  // Cap delta time to prevent physics anomalies during background tab throttling or extreme lag spikes
+  const dt = Math.min(deltaTime, 4.0);
+  
   frameCount++;
   if (now - lastTime >= 1000) {
     dbgFps.innerText = frameCount;
@@ -822,7 +831,7 @@ function runLoop() {
   
   // 1. Calibration phase
   if (currentGameState === GAME_STATE.CALIBRATING) {
-    updateOnboarding();
+    updateOnboarding(dt);
   }
   
   // 2. Play phase
@@ -833,7 +842,7 @@ function runLoop() {
     
     // Invincibility frame updates
     if (invincibilityFrames > 0) {
-      invincibilityFrames--;
+      invincibilityFrames -= dt;
     }
     
     // Sync monitor panel
@@ -856,11 +865,11 @@ function runLoop() {
     
     // Screen Shake
     if (screenShakeTimer > 0) {
-      screenShakeTimer--;
+      screenShakeTimer -= dt;
       const dx = (Math.random() - 0.5) * screenShakeIntensity;
       const dy = (Math.random() - 0.5) * screenShakeIntensity;
       ctx.translate(dx, dy);
-      screenShakeIntensity *= 0.92;
+      screenShakeIntensity *= Math.pow(0.92, dt);
     }
     
     // Draw Background
@@ -901,12 +910,12 @@ function runLoop() {
     }
     
     // Update and Draw Bird
-    bird.update(mouthOpen);
+    bird.update(mouthOpen, dt);
     bird.draw(ctx);
     
     // Spawning pipes
-    spawnTimer++;
-    if (spawnTimer >= 105) { // Spawn pipe every 105 frames
+    spawnTimer += dt;
+    if (spawnTimer >= 105) { // Spawn pipe every 105 frames baseline (approx 1.75s)
       spawnTimer = 0;
       pipes.push(new ObstaclePipe());
     }
@@ -914,7 +923,7 @@ function runLoop() {
     // Update and Draw Pipes
     for (let i = pipes.length - 1; i >= 0; i--) {
       const p = pipes[i];
-      p.update();
+      p.update(dt);
       p.draw(ctx);
       
       // Collision checking
@@ -934,8 +943,8 @@ function runLoop() {
         if (lives <= 0) {
           triggerGameOver();
         } else {
-          // Invincibility recovery window
-          invincibilityFrames = 90; // 1.5 seconds
+          // Invincibility recovery window (90 frames equivalent)
+          invincibilityFrames = 90;
           
           // Clear immediate pipes in front to give space
           pipes = pipes.filter(p2 => p2.x < bird.x - 100 || p2.x > bird.x + 300);
@@ -966,7 +975,7 @@ function runLoop() {
     // Update and Draw Particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
-      p.update();
+      p.update(dt);
       p.draw(ctx);
       if (p.alpha <= 0) {
         particles.splice(i, 1);

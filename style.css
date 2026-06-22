@@ -603,6 +603,9 @@ footer p {
   position: relative;
   animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   color: var(--text-primary);
+  max-height: 90dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 @keyframes modalScaleUp {
@@ -1264,4 +1267,27 @@ footer p {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+
+@media (max-width: 480px) {
+  nav ul {
+    gap: 10px !important;
+  }
+  nav a {
+    font-size: 0.7rem !important;
+    padding: 4px 8px !important;
+  }
+  .user-profile-nav {
+    padding: 4px 8px !important;
+    gap: 6px !important;
+  }
+  .user-avatar {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.7rem !important;
+  }
+  .user-name-display {
+    font-size: 0.75rem !important;
+  }
+}
+
 

@@ -951,6 +951,12 @@ body {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+
+  .camera-wrapper {
+    width: 280px !important;
+    height: 210px !important;
+    max-width: 100% !important;
+  }
   
   .glass-card {
     padding: 25px;
@@ -1011,7 +1017,288 @@ body {
   #camera-inset-container {
     width: 100px;
     height: 75px;
-    bottom: 15px;
-    right: 15px;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: auto;
+    right: auto;
   }
 }
+
+/* Phone View Sizing Overrides */
+@media (max-width: 480px) {
+  .game-subtitle {
+    display: none !important;
+  }
+  .setup-steps-panel p {
+    display: none !important;
+  }
+  .step-desc {
+    display: none !important;
+  }
+  .mic-hint-text {
+    display: none !important;
+  }
+
+  .glass-card.setup-card {
+    padding: 15px !important;
+    max-height: 95vh !important;
+    margin: 10px !important;
+  }
+
+  .game-title {
+    font-size: 1.6rem !important;
+    margin-bottom: 5px !important;
+  }
+
+  .camera-wrapper {
+    width: 180px !important;
+    height: 135px !important;
+  }
+
+  .setup-layout {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .sensor-test-container {
+    padding: 8px 10px !important;
+  }
+
+  .steps-list {
+    gap: 8px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .step-item {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .step-icon {
+    font-size: 1.2rem !important;
+  }
+
+  .step-title {
+    font-size: 0.8rem !important;
+  }
+
+  .btn {
+    padding: 8px 16px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .btn.action-btn {
+    font-size: 0.9rem !important;
+  }
+
+  .setup-actions {
+    padding-top: 15px !important;
+  }
+}
+
+/* Instagram Stories Share Button Style */
+.btn.style-share {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: rgba(0, 229, 255, 0.03);
+  flex: 1.2;
+}
+
+.btn.style-share:hover:not(:disabled) {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Share Story Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 3, 8, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Glassmorphic Card */
+.modal-card {
+  max-width: 440px !important;
+  width: 100%;
+  padding: 25px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 90vh;
+  box-shadow: 0 0 40px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.02);
+  animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow-y: auto;
+}
+
+@keyframes modalScaleUp {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.modal-header h3 {
+  color: var(--neon-cyan);
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: var(--neon-pink);
+}
+
+.modal-subtitle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.modal-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Story Card Preview Wrapper */
+.story-preview-wrapper {
+  position: relative;
+  width: 220px;
+  aspect-ratio: 9/16;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  background: #09090f;
+}
+
+#story-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Spinner overlay for image loading */
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  background: #09090f;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(0, 229, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--neon-cyan);
+  animation: spinnerRotate 1s linear infinite;
+}
+
+.loading-text {
+  font-size: 0.7rem;
+  color: var(--neon-cyan);
+  letter-spacing: 1px;
+}
+
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn.style-download {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255, 0, 85, 0.03);
+  flex: 1;
+}
+
+.btn.style-download:hover:not(:disabled) {
+  background: var(--neon-pink);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn.style-native-share {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: rgba(0, 229, 255, 0.03);
+  flex: 1;
+}
+
+.btn.style-native-share:hover:not(:disabled) {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Stacking buttons for mobile readability */
+@media (max-width: 600px) {
+  .results-actions {
+    flex-direction: column;
+    gap: 10px !important;
+  }
+  .btn.style-retry, .btn.style-share, .btn.style-lobby {
+    width: 100%;
+    flex: none !important;
+    padding: 10px 20px !important;
+  }
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn.style-download, .btn.style-native-share {
+    width: 100%;
+    flex: none !important;
+  }
+}
+

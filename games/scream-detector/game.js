@@ -15,6 +15,9 @@ let peakDecibel = 0;
 let snapshots = [];
 let lastSnapshotTime = 0;
 const snapshotInterval = 300; // capture frame every 300ms
+let generatedStoryBlob = null;
+let generatedStoryDataUrl = null;
+
 
 // DOM Elements
 const setupScreen = document.getElementById('setup-screen');
@@ -45,6 +48,14 @@ const ratingBadge = document.getElementById('rating-badge');
 const ratingDesc = document.getElementById('rating-desc');
 const photoGallery = document.getElementById('photo-gallery');
 const btnRetry = document.getElementById('btn-retry');
+const btnShareInstagram = document.getElementById('btn-share-instagram');
+const shareModal = document.getElementById('share-modal');
+const btnCloseModal = document.getElementById('btn-close-modal');
+const btnDownloadStory = document.getElementById('btn-download-story');
+const btnNativeShare = document.getElementById('btn-native-share');
+const storyPreviewImg = document.getElementById('story-preview-img');
+const storyLoadingSpinner = document.getElementById('story-loading-spinner');
+
 
 // Off-screen canvas for capturing webcam snapshots
 const captureCanvas = document.createElement('canvas');
@@ -55,6 +66,17 @@ btnRequestAccess.addEventListener('click', requestMediaPermissions);
 btnStartGame.addEventListener('click', enterScreamArena);
 screamMicBtn.addEventListener('click', startScreamSession);
 btnRetry.addEventListener('click', resetToScreamArena);
+btnShareInstagram.addEventListener('click', openShareModal);
+btnCloseModal.addEventListener('click', closeShareModal);
+btnDownloadStory.addEventListener('click', downloadStoryImage);
+btnNativeShare.addEventListener('click', triggerNativeShare);
+// Close modal on background click
+shareModal.addEventListener('click', (e) => {
+  if (e.target === shareModal) {
+    closeShareModal();
+  }
+});
+
 
 // Clean up audio context on window unload
 window.addEventListener('beforeunload', () => {
@@ -469,3 +491,365 @@ function saveHighscore(score) {
     console.error("Failed to write highscore to localstorage:", e);
   }
 }
+
+/**
+ * Opens the sharing modal and triggers rendering of the Instagram Story card
+ */
+async function openShareModal() {
+  shareModal.style.display = 'flex';
+
+  // Reset UI elements to loading state
+  storyLoadingSpinner.style.display = 'flex';
+  storyPreviewImg.style.display = 'none';
+  btnDownloadStory.disabled = true;
+  btnNativeShare.disabled = true;
+  btnNativeShare.style.display = 'none';
+
+  try {
+    generatedStoryDataUrl = await generateStoryImage();
+    storyPreviewImg.src = generatedStoryDataUrl;
+
+    // Convert data URL to Blob for native file sharing API
+    const res = await fetch(generatedStoryDataUrl);
+    generatedStoryBlob = await res.blob();
+
+    // Show preview and enable actions
+    storyLoadingSpinner.style.display = 'none';
+    storyPreviewImg.style.display = 'block';
+    btnDownloadStory.disabled = false;
+
+    // Detect file sharing capabilities
+    if (navigator.canShare && navigator.share) {
+      const file = new File([generatedStoryBlob], 'scream_story.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        btnNativeShare.style.display = 'block';
+        btnNativeShare.disabled = false;
+      }
+    }
+  } catch (err) {
+    console.error('Error during story preview generation:', err);
+    alert('Something went wrong generating your story image. You can still download it normally if it appears.');
+    storyLoadingSpinner.style.display = 'none';
+    storyPreviewImg.style.display = 'block';
+    btnDownloadStory.disabled = false;
+  }
+}
+
+/**
+ * Closes the sharing modal and clears memory
+ */
+function closeShareModal() {
+  shareModal.style.display = 'none';
+  storyPreviewImg.src = '';
+  generatedStoryBlob = null;
+  generatedStoryDataUrl = null;
+}
+
+/**
+ * Downloads the generated PNG image to user's device
+ */
+function downloadStoryImage() {
+  if (!generatedStoryDataUrl) return;
+
+  const link = document.createElement('a');
+  link.href = generatedStoryDataUrl;
+  link.download = `gesturezone_scream_${peakDecibel}dB.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * Triggers native system share dialog on supported browsers (mobile devices)
+ */
+async function triggerNativeShare() {
+  if (!generatedStoryBlob) return;
+
+  try {
+    const file = new File([generatedStoryBlob], `scream_story_${peakDecibel}db.png`, { type: 'image/png' });
+    await navigator.share({
+      files: [file],
+      title: 'Scream Detector on Gesture Zone',
+      text: `I reached a peak scream level of ${peakDecibel} dB on Gesture Zone! Can you beat my score? Play at gesturezone.web.app`,
+    });
+  } catch (err) {
+    console.log('User cancelled or browser failed to share natively:', err);
+  }
+}
+
+/**
+ * Helper: loads an image URL/data URL into an Image element asynchronously
+ */
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = (e) => reject(e);
+    img.src = src;
+  });
+}
+
+/**
+ * Helper: draws a rounded rectangle path on context
+ */
+function drawRoundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+/**
+ * Renders the story image onto an offscreen canvas and returns its data URL
+ */
+async function generateStoryImage() {
+  const width = 1080;
+  const height = 1920;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Draw solid dark gradient background
+  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+  bgGrad.addColorStop(0, '#0a0914');
+  bgGrad.addColorStop(0.5, '#0e0b1c');
+  bgGrad.addColorStop(1, '#1e0c24');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  // 2. Draw ambient radial glows
+  // Pink glow top left
+  const pinkGlow = ctx.createRadialGradient(200, 300, 0, 200, 300, 600);
+  pinkGlow.addColorStop(0, 'rgba(255, 0, 85, 0.18)');
+  pinkGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = pinkGlow;
+  ctx.fillRect(0, 0, width, height);
+
+  // Cyan glow bottom right
+  const cyanGlow = ctx.createRadialGradient(900, 1600, 0, 900, 1600, 700);
+  cyanGlow.addColorStop(0, 'rgba(0, 229, 255, 0.15)');
+  cyanGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = cyanGlow;
+  ctx.fillRect(0, 0, width, height);
+
+  // 3. Draw grid lines (faint)
+  ctx.strokeStyle = 'rgba(255, 0, 85, 0.015)';
+  ctx.lineWidth = 2;
+  const gridSize = 60;
+  for (let x = 0; x < width; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+  for (let y = 0; y < height; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  // 4. Branding Header
+  ctx.shadowColor = 'rgba(0, 229, 255, 0.6)';
+  ctx.shadowBlur = 15;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 52px "Orbitron", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('GESTURE ZONE', width / 2, 120);
+
+  ctx.shadowColor = 'rgba(255, 0, 85, 0.5)';
+  ctx.shadowBlur = 10;
+  ctx.fillStyle = '#ff0055';
+  ctx.font = '800 28px "Orbitron", sans-serif';
+  ctx.fillText('SCREAM DETECTOR', width / 2, 180);
+
+  // Reset shadow for standard elements
+  ctx.shadowBlur = 0;
+
+  // 5. Giant Score display circle
+  ctx.fillStyle = 'rgba(24, 24, 32, 0.65)';
+  ctx.strokeStyle = '#ff0055';
+  ctx.lineWidth = 4;
+  ctx.shadowColor = 'rgba(255, 0, 85, 0.35)';
+  ctx.shadowBlur = 25;
+  ctx.beginPath();
+  ctx.arc(width / 2, 510, 160, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowBlur = 0; // reset
+
+  // Score value
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 135px "Orbitron", sans-serif';
+  ctx.fillText(peakDecibel, width / 2, 480);
+
+  // Score label
+  ctx.fillStyle = '#8e90a6';
+  ctx.font = '800 24px "Orbitron", sans-serif';
+  ctx.fillText('DECIBELS REACHED', width / 2, 580);
+
+  // 6. Rating classification title
+  ctx.fillStyle = '#00e5ff';
+  ctx.font = '900 36px "Orbitron", sans-serif';
+  ctx.shadowColor = 'rgba(0, 229, 255, 0.5)';
+  ctx.shadowBlur = 15;
+  ctx.fillText(ratingBadge.textContent, width / 2, 750);
+  ctx.shadowBlur = 0; // reset
+
+  // 7. Reaction Photos (Top 3 physical-style polaroids)
+  const topPics = snapshots.slice(0, 3);
+
+  if (topPics.length > 0) {
+    try {
+      const loadedImages = await Promise.all(
+        topPics.map(pic => loadImage(pic.dataUrl))
+      );
+
+      if (loadedImages.length === 3) {
+        // Draw three polaroids overlapping in a fan collage
+        // Left polaroid (drawn first, bottom of stack)
+        drawPolaroid(ctx, loadedImages[1], topPics[1].db, 280, 1180, 340, 410, -12);
+        // Right polaroid (drawn second, bottom/middle of stack)
+        drawPolaroid(ctx, loadedImages[2], topPics[2].db, 800, 1195, 340, 410, 14);
+        // Middle polaroid (drawn last, top of stack)
+        drawPolaroid(ctx, loadedImages[0], topPics[0].db, 540, 1110, 370, 440, -3);
+      } else if (loadedImages.length === 2) {
+        // Draw two polaroids side by side with tilt angles
+        // Left polaroid
+        drawPolaroid(ctx, loadedImages[0], topPics[0].db, 305, 1140, 360, 430, -5);
+        // Right polaroid
+        drawPolaroid(ctx, loadedImages[1], topPics[1].db, 725, 1170, 360, 430, 5);
+      } else {
+        // Draw one large polaroid in the middle
+        drawPolaroid(ctx, loadedImages[0], topPics[0].db, width / 2, 1150, 440, 520, 3);
+      }
+    } catch (err) {
+      console.error('Error loading reaction images for canvas:', err);
+      drawNoWebcamPlaceholder(ctx, width / 2, 1150);
+    }
+  } else {
+    // Draw placeholder for no photos
+    drawNoWebcamPlaceholder(ctx, width / 2, 1150);
+  }
+
+  // 8. Footer CTA
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 28px "Orbitron", sans-serif';
+  ctx.fillText('CAN YOU BEAT MY SCREAM?', width / 2, 1550);
+
+  // 9. Pill Badge with URL link
+  const pillWidth = 540;
+  const pillHeight = 70;
+  const pillX = (width - pillWidth) / 2;
+  const pillY = 1630;
+  const pillRadius = 35;
+
+  ctx.strokeStyle = '#00e5ff';
+  ctx.lineWidth = 2;
+  ctx.fillStyle = '#060606';
+  ctx.shadowColor = 'rgba(0, 229, 255, 0.4)';
+  ctx.shadowBlur = 15;
+
+  drawRoundRect(ctx, pillX, pillY, pillWidth, pillHeight, pillRadius);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowBlur = 0; // reset
+
+  ctx.fillStyle = '#00e5ff';
+  ctx.font = '800 32px "Outfit", sans-serif';
+  ctx.fillText('gesturezone.web.app', width / 2, pillY + pillHeight / 2);
+
+  return canvas.toDataURL('image/png');
+}
+
+/**
+ * Draws a beautiful physical polaroid card on the canvas with context rotation
+ */
+function drawPolaroid(ctx, img, db, x, y, width, height, angleDegrees) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angleDegrees * Math.PI / 180);
+
+  // Shadow for physical look
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 10;
+
+  // White base polaroid card
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(-width / 2, -height / 2, width, height);
+
+  ctx.shadowBlur = 0; // disable shadow for interior components
+  ctx.shadowOffsetY = 0;
+
+  // Render Image (centered horizontally in top half)
+  const imgWidth = width - 40;
+  const imgHeight = imgWidth * 0.75; // aspect ratio 4:3
+  const imgX = -width / 2 + 20;
+  const imgY = -height / 2 + 20;
+
+  // Draw black backdrop behind the image in case of aspect ratio issues
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(imgX, imgY, imgWidth, imgHeight);
+  ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+
+  // Image border line
+  ctx.strokeStyle = '#dddddd';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(imgX, imgY, imgWidth, imgHeight);
+
+  // Caption text (decibel score of that frame)
+  ctx.fillStyle = '#111111';
+  ctx.font = '700 24px "Courier Prime", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${db} dB Frame`, 0, height / 2 - 35);
+
+  ctx.restore();
+}
+
+/**
+ * Draws a placeholder graphics card when webcam captures are missing
+ */
+function drawNoWebcamPlaceholder(ctx, x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const width = 450;
+  const height = 400;
+
+  // Glass card outline
+  ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
+  ctx.lineWidth = 2;
+  ctx.fillStyle = 'rgba(24, 24, 32, 0.5)';
+  drawRoundRect(ctx, -width / 2, -height / 2, width, height, 16);
+  ctx.fill();
+  ctx.stroke();
+
+  // Emoji / Icon
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Outfit", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📸', 0, -50);
+
+  // Description lines
+  ctx.fillStyle = '#8e90a6';
+  ctx.font = '600 22px "Outfit", sans-serif';
+  ctx.fillText('No reaction snapshots taken.', 0, 30);
+  ctx.fillText('Make more noise to snap photos!', 0, 75);
+
+  ctx.restore();
+}
+

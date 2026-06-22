@@ -1163,6 +1163,12 @@ body, html {
 
 /* --- Mobile responsiveness --- */
 @media (max-width: 900px) {
+  .screen-overlay {
+    justify-content: flex-start !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .calibration-box.gothic-box {
     width: 95% !important;
     max-height: 90vh !important;

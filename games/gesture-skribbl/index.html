@@ -71,24 +71,17 @@
           <h2>How to Play (Gesture Guide)</h2>
           <div class="instructions-grid">
             <div class="instruction-item">
-              <div class="gesture-icon">✌️</div>
+              <div class="gesture-icon">✊</div>
               <div class="gesture-info">
-                <h3>Peace Sign: Hover / Move</h3>
-                <p>Extend your <strong>Index</strong> and <strong>Middle</strong> fingers and separate them in a V-shape. Use this to move the brush cursor around the board without drawing or erasing.</p>
+                <h3>Fist: Hover / Move</h3>
+                <p>Make a closed <strong>Fist</strong> (or relax your hand) to move the brush cursor around the board without drawing or erasing.</p>
               </div>
             </div>
             <div class="instruction-item">
               <div class="gesture-icon">☝️</div>
               <div class="gesture-info">
-                <h3>Fingers Closed: Draw</h3>
-                <p>Bring your extended <strong>Index</strong> and <strong>Middle</strong> fingers close together (touching). Smooth lines will draw automatically tracking your fingers.</p>
-              </div>
-            </div>
-            <div class="instruction-item">
-              <div class="gesture-icon">🤚</div>
-              <div class="gesture-info">
-                <h3>Open Palm: Erase</h3>
-                <p>Fully extend and spread <strong>all fingers</strong>. Move your palm over the lines to rub them out with a thick eraser brush.</p>
+                <h3>Point Finger: Action</h3>
+                <p>Extend only your <strong>Index</strong> finger. When the <strong>Pen</strong> tool is selected, this draws lines. When the <strong>Eraser</strong> tool is selected, this erases lines.</p>
               </div>
             </div>
           </div>
@@ -225,6 +218,7 @@
 
             <!-- Clear & Tools -->
             <div style="display: flex; gap: 8px;">
+              <button class="back-btn active" id="btn-pen-tool" style="color: var(--primary-accent); border-color: var(--primary-accent); background-color: rgba(255, 0, 204, 0.15);">Pen</button>
               <button class="back-btn" id="btn-eraser-tool" style="color: var(--warning); border-color: rgba(241, 196, 15, 0.3);">Eraser</button>
               <button class="back-btn" id="btn-clear-canvas" style="color: var(--danger); border-color: rgba(231, 76, 60, 0.3);">Clear</button>
             </div>
@@ -260,9 +254,8 @@
           <h4>Webcam Gesture Controls</h4>
           <p>Stand back so the camera sees your hands. Center your hand in the camera view.</p>
           <div class="gesture-badges">
-            <div class="gesture-badge" id="badge-hover">✌️ Peace Sign (Hover)</div>
-            <div class="gesture-badge" id="badge-draw">☝️ Fingers Closed (Draw)</div>
-            <div class="gesture-badge" id="badge-erase">🤚 Open Palm (Erase)</div>
+            <div class="gesture-badge" id="badge-hover">✊ Fist (Hover)</div>
+            <div class="gesture-badge" id="badge-action">☝️ Point Finger (Action)</div>
           </div>
         </div>
       </div>
