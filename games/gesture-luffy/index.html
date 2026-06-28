@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesture Luffy — Gesture Zone</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Include Shared Movement Engine Scripts -->
+  <script src="../../engine/gemini.js"></script>
+  <script src="../../engine/optical.js"></script>
+  <script src="../../engine/movement.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Vignette Retro Border -->
+    <div class="vignette"></div>
+
+    <!-- Return to lobby -->
+    <button class="back-to-lobby" id="btn-back-lobby" onclick="window.location.href='../../index.html'">← Lobby</button>
+
+    <!-- Main Game Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Active HUD -->
+    <div id="hud" style="display: none;">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="hud-mode-display">
+            MODE: <span id="hud-mode-val" style="color: #ff3b30; text-shadow: 0 0 10px rgba(255, 59, 48, 0.5);">SANDBOX</span>
+          </div>
+          <div class="hud-sub-label">
+            GESTURE: <span id="hud-gesture-val" style="color: #ffd700;">IDLE</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-item" id="hud-sandbox-label">FACE STRETCH ACTIVE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hype/Action Announcements -->
+    <div id="announcement">READY</div>
+
+    <!-- Main Menu Overlay -->
+    <div id="menu-overlay" class="screen-overlay">
+      <h1 class="game-title">GESTURE LUFFY</h1>
+      <p class="game-subtitle">Awaken the Gomu Gomu no Mi! Use your facial landmarks and hand gestures to stretch your face like rubber!</p>
+      
+      <div class="control-expl">
+        <div class="expl-header">Rubbery Controls</div>
+        
+        <div class="expl-section">
+          <div class="expl-row"><span>PINCH + DRAG NEAR CHEEK/NOSE/CHIN 👉</span> Pulls and stretches your skin like rubber!</div>
+          <div class="expl-row"><span>RELEASE PINCH 👐</span> Cheek snaps back with springy recoil and sound!</div>
+          <div class="expl-row"><span>OPEN MOUTH WIDE 😮</span> Stretches your mouth vertically like Luffy laughing!</div>
+        </div>
+        
+        <div class="expl-fallback">Interact by clicking and dragging with your mouse, or pinching in front of your webcam.</div>
+      </div>
+
+      <button id="btn-enter-calibration" class="btn" style="border-color:#ff3b30; margin-top:15px;">Enable Webcam & Calibrate</button>
+    </div>
+
+    <!-- Onboarding / Calibration Overlay -->
+    <div id="calibration-overlay" style="display: none;">
+      <div class="calibration-box">
+        <div class="calibration-content-layout">
+          <!-- Left Column: Steps -->
+          <div class="calibration-steps-panel">
+            <div class="calibration-header">
+              <h2>Rubbery Calibration</h2>
+              <p>Authorize camera and test both hand pinch and face mesh tracking to synchronize your rubber cells.</p>
+            </div>
+
+            <div class="steps-list">
+              <!-- Step 1 -->
+              <div id="step-1" class="step-item active">
+                <div class="step-info">
+                  <div class="step-name">1. Camera Access</div>
+                  <div class="step-desc">Click "Enable" to grant access to your video stream.</div>
+                </div>
+                <div class="step-status">
+                  <button id="btn-enable-camera" class="btn btn-secondary" style="padding: 6px 15px; font-size:0.75rem;">Enable</button>
+                  <div class="step-indicator">1</div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div id="step-2" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">2. Centering & Face Check</div>
+                  <div class="step-desc">Keep your head inside the guide. Loading face mesh markers.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-2-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">2</div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div id="step-3" class="step-item">
+                <div class="step-info">
+                  <div class="step-name">3. Test Gomu Pinch</div>
+                  <div class="step-desc">Pinch index/thumb together to test the elastic stretching sensor.</div>
+                </div>
+                <div class="step-status">
+                  <div class="step-progress-bar"><div id="step-3-progress" class="step-progress-fill"></div></div>
+                  <div class="step-indicator">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Video + Overlays -->
+          <div class="calibration-camera-panel">
+            <div class="camera-wrapper">
+              <video id="webcam-calibration-view" autoplay muted playsinline></video>
+              <canvas id="calibration-canvas-overlay" width="320" height="240"></canvas>
+            </div>
+            
+            <div class="motion-status-display">
+              <div class="status-indicator-box">
+                <span class="status-label">HANDS ENGINE</span>
+                <span id="stat-hands-connected" class="status-value val-false">DISCONNECTED</span>
+              </div>
+              <div class="status-indicator-box">
+                <span class="status-label">PINCH DETECTED</span>
+                <span id="stat-pinch" class="status-value val-false">NO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-actions">
+          <button id="btn-start-game" class="btn btn-start-game" disabled>Awaken Devil Fruit</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Mini Camera Preview (Bottom-Left) -->
+    <div id="camera-preview-container">
+      <video id="webcam-view" autoplay muted playsinline></video>
+      <div class="camera-label">Webcam Sensor</div>
+      <div class="hand-tracking-light">
+        <span class="indicator-dot" id="ind-luffy-active"></span>
+        <span id="ind-luffy-text" class="dir-indicator">TRACKER OFFLINE</span>
+      </div>
+    </div>
+
+    <!-- Development Debug / Status Panel (Bottom-Right) -->
+    <div id="debug-panel">
+      <div class="debug-header">Rubbery Sensor Monitor</div>
+      <div class="debug-row"><span>Hands Tracked:</span><span id="dbg-hands-count" class="debug-val">0</span></div>
+      <div class="debug-row"><span>Face Landmarked:</span><span id="dbg-face-ok" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Pinch state:</span><span id="dbg-pinch-val" class="debug-val">false</span></div>
+      <div class="debug-row"><span>Pinch Dist:</span><span id="dbg-pinch-dist" class="debug-val">1.00</span></div>
+      <div class="debug-row"><span>Active Stretch:</span><span id="dbg-stretch" class="debug-val">none</span></div>
+      <div class="debug-row"><span>Mouth Open:</span><span id="dbg-mouth" class="debug-val">false</span></div>
+      <div class="debug-row"><span>FPS:</span><span id="dbg-fps" class="debug-val">60</span></div>
+    </div>
+  </div>
+
+  <!-- Include Game Logic -->
+  <script src="game.js"></script>
+  <script type="module" src="../../engine/multiplayer.js"></script>
+</body>
+</html>

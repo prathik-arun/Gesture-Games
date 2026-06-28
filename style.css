@@ -431,6 +431,15 @@ nav a.active, nav a:hover {
   border-color: #ff0055;
   box-shadow: 0 0 25px rgba(255, 0, 85, 0.65);
 }
+.game-card.theme-surfer:hover {
+  border-color: #ff0055;
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.65);
+}
+.game-card.theme-luffy:hover {
+  border-color: #ff3b30;
+  box-shadow: 0 0 25px rgba(255, 59, 48, 0.65);
+}
+
 
 .game-preview {
   height: 180px;

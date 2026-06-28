@@ -22,7 +22,10 @@
     <header class="creator-header">
       <div class="header-left">
         <a href="lobby.html" class="back-btn">← Lobby</a>
-        <div class="creator-title">GLITCH GAME <span>CREATOR</span></div>
+        <div class="creator-title">
+          <img src="assets/logo.png" alt="Glitch Logo" class="header-logo">
+          GLITCH GAME <span>CREATOR</span>
+        </div>
       </div>
       <div class="header-right">
         <div class="system-node">NODE: <span id="node-id">GLITCH_BUILDER_v1.0</span></div>
@@ -31,16 +34,200 @@
     </header>
 
     <!-- Main Workspace Layout -->
-    <main class="workspace">
+    <main class="workspace state-centered" id="workspace">
       <!-- Workspace tabs switcher for mobile/tablet screens -->
-      <div class="workspace-tabs">
+      <div class="workspace-tabs" id="workspace-tabs">
         <button class="w-tab-btn active" data-target="chat">Glitch Chat</button>
         <button class="w-tab-btn" data-target="preview">Playtest Sandbox</button>
       </div>
       
       <!-- Left Pane: Glitch AI Chatbot -->
-      <section class="pane chat-pane active">
-        <div class="pane-header">
+      <section class="pane chat-pane active" id="chat-pane">
+        <!-- Wizard Questionnaire UI -->
+        <div class="wizard-container" id="wizard-container">
+          <div class="wizard-progress-bar">
+            <div class="progress-fill" id="wizard-progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="wizard-step-title" id="wizard-step-title">Describe your game idea</div>
+          
+          <!-- Step 1: Game Idea -->
+          <div class="wizard-step-panel active" id="step-panel-idea">
+            <div class="wizard-prompt-tabs">
+              <button class="prompt-tab-btn active">🎮 Web App Game</button>
+            </div>
+            <div class="wizard-input-box">
+              <textarea id="wizard-idea-input" placeholder="Describe your game idea... e.g., 'A territory capture game like paper.io where you steer by leaning left and right'" required></textarea>
+              <div class="wizard-input-footer">
+                <button type="button" class="wizard-next-btn" id="btn-next-idea">Continue →</button>
+              </div>
+            </div>
+            <div class="wizard-suggestions-label">Not sure where to start? Try these:</div>
+            <div class="wizard-suggestions" id="wizard-suggestions-grid">
+              <!-- Dynamically populated suggestion chips -->
+            </div>
+          </div>
+
+          <!-- Step 2: Engine Selector -->
+          <div class="wizard-step-panel" id="step-panel-engine">
+            <div class="wizard-cards-grid">
+              <div class="wizard-card" data-value="2D Canvas">
+                <div class="card-icon">🔲</div>
+                <div class="card-title">2D Canvas</div>
+                <div class="card-desc">Fast, retro-style physics and sprites. Perfect for grid games, runners, and classic arcades.</div>
+              </div>
+              <div class="wizard-card" data-value="3D Three.js">
+                <div class="card-icon">🧊</div>
+                <div class="card-title">3D Three.js</div>
+                <div class="card-desc">Sleek three-dimensional geometry, glowing particles, and dynamic camera angles.</div>
+              </div>
+            </div>
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-engine">← Back</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Visual Theme Palette Selector -->
+          <div class="wizard-step-panel" id="step-panel-theme">
+            <div class="wizard-cards-grid grid-2x2">
+              <div class="wizard-card theme-card" data-value="Neon Cyberpunk (pink/cyan)">
+                <div class="theme-colors"><span class="color-dot pink"></span><span class="color-dot cyan"></span></div>
+                <div class="card-title">Neon Cyberpunk</div>
+                <div class="card-desc">Electric pink and neon cyan glow on midnight black.</div>
+              </div>
+              <div class="wizard-card theme-card" data-value="Acid Matrix (black/green)">
+                <div class="theme-colors"><span class="color-dot matrix"></span><span class="color-dot green"></span></div>
+                <div class="card-title">Acid Matrix</div>
+                <div class="card-desc">Retro-grid aesthetics, neon green code terminals.</div>
+              </div>
+              <div class="wizard-card theme-card" data-value="Industrial Steel (gray/orange)">
+                <div class="theme-colors"><span class="color-dot orange"></span><span class="color-dot steel"></span></div>
+                <div class="card-title">Industrial Steel</div>
+                <div class="card-desc">Caution orange warning stripes, metallic gradients.</div>
+              </div>
+              <div class="wizard-card theme-card" data-value="Oceanic Breeze (blue/teal)">
+                <div class="theme-colors"><span class="color-dot blue"></span><span class="color-dot teal"></span></div>
+                <div class="card-title">Oceanic Breeze</div>
+                <div class="card-desc">Fluid aquatic animations, deep blue and electric teal.</div>
+              </div>
+              <div class="wizard-card theme-card" id="theme-card-custom" data-value="custom" style="grid-column: span 2;">
+                <div class="theme-colors"><span class="color-dot" style="color: #888; background-color: #888;"></span></div>
+                <div class="card-title">Custom Theme...</div>
+                <div class="card-desc">Type your own custom color scheme or aesthetic style.</div>
+              </div>
+            </div>
+            
+            <!-- Custom Theme Text Input -->
+            <div class="custom-gesture-row" id="custom-theme-row" style="display: none; margin-top: 15px; width: 100%; display: none; gap: 10px; align-items: center;">
+              <input type="text" id="custom-theme-input" placeholder="Type custom theme description (e.g. Sunset Gold & Synthwave Purple)..." style="flex: 1; padding: 10px 14px; background: rgba(15,15,15,0.9); border: 1px solid var(--border-color); border-radius: 6px; color:#fff; font-family:inherit; font-size:0.85rem;">
+              <button type="button" class="wizard-next-btn" id="btn-confirm-custom-theme" style="padding: 10px 20px;">Confirm</button>
+            </div>
+
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-theme">← Back</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Gestures Selector -->
+          <div class="wizard-step-panel" id="step-panel-gestures">
+            <div class="wizard-gestures-list">
+              <label class="gesture-check-label"><input type="checkbox" value="March in Place (Movement)"> <span class="chk-custom"></span> March in Place (walk/run)</label>
+              <label class="gesture-check-label"><input type="checkbox" value="Lean Left/Right (Steering/Dodging)" checked> <span class="chk-custom"></span> Lean Left/Right (dodge/slide)</label>
+              <label class="gesture-check-label"><input type="checkbox" value="Pinch Fingers (Action/Shoot/Draw)" checked> <span class="chk-custom"></span> Pinch Fingers (shoot/draw)</label>
+              <label class="gesture-check-label"><input type="checkbox" value="Open Hand/Palm (Erase/Interact)"> <span class="chk-custom"></span> Open Hand/Palm (erase)</label>
+              <label class="gesture-check-label"><input type="checkbox" value="Open Mouth (Vertical Rise/Blow)"> <span class="chk-custom"></span> Open Mouth (fly/blow)</label>
+              <label class="gesture-check-label"><input type="checkbox" value="Voice Commands ('go', 'stop', 'reload')"> <span class="chk-custom"></span> Voice Commands</label>
+            </div>
+
+            <!-- Custom Gesture Text Input -->
+            <div class="custom-gesture-row" style="margin-top: 15px; width: 100%;">
+              <input type="text" id="wizard-custom-gesture-input" placeholder="Or type custom gesture mapping (e.g. Squat to jump, Tilt head to steer)...">
+            </div>
+
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-gestures">← Back</button>
+              <button type="button" class="wizard-next-btn" id="btn-next-gestures">Confirm Gestures →</button>
+            </div>
+          </div>
+
+          <!-- Step 5: Character Asset Selector -->
+          <div class="wizard-step-panel" id="step-panel-character">
+            <div class="wizard-cards-grid grid-2x2">
+              <div class="wizard-card asset-card" data-value="char_option_1">
+                <canvas id="canvas-char-0" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-char-0">T-Rex / Fighter</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="char_option_2">
+                <canvas id="canvas-char-1" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-char-1">Raptor / Dreadnought</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="char_option_3">
+                <canvas id="canvas-char-2" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-char-2">Pterodactyl / Speeder</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="char_option_4">
+                <canvas id="canvas-char-3" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-char-3">Plesiosaur / Sentinel</div>
+              </div>
+            </div>
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-character">← Back</button>
+            </div>
+          </div>
+
+          <!-- Step 6: Background Scene Selector -->
+          <div class="wizard-step-panel" id="step-panel-background">
+            <div class="wizard-cards-grid grid-2x2">
+              <div class="wizard-card asset-card" data-value="bg_option_1">
+                <canvas id="canvas-bg-0" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-bg-0">Parallax Hills / Stars</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="bg_option_2">
+                <canvas id="canvas-bg-1" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-bg-1">Matrix Code / Asteroids</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="bg_option_3">
+                <canvas id="canvas-bg-2" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-bg-2">Neon Grid / Hypergrid</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="bg_option_4">
+                <canvas id="canvas-bg-3" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-bg-3">Space Nebula / Dust</div>
+              </div>
+            </div>
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-background">← Back</button>
+            </div>
+          </div>
+
+          <!-- Step 7: Obstacle/Enemy Selector -->
+          <div class="wizard-step-panel" id="step-panel-obstacle">
+            <div class="wizard-cards-grid grid-2x2">
+              <div class="wizard-card asset-card" data-value="obs_option_1">
+                <canvas id="canvas-obs-0" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-obs-0">Cactus / Octagon</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="obs_option_2">
+                <canvas id="canvas-obs-1" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-obs-1">Spike Wheel / Spike Drone</div>
+              </div>
+
+              <div class="wizard-card asset-card" data-value="obs_option_3">
+                <canvas id="canvas-obs-2" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-obs-2">Laser Gate / Cruiser</div>
+              </div>
+              <div class="wizard-card asset-card" data-value="obs_option_4">
+                <canvas id="canvas-obs-3" class="asset-preview-canvas" width="120" height="90"></canvas>
+                <div class="card-title" id="lbl-obs-3">Cyber Drone / Warp Invader</div>
+              </div>
+            </div>
+            <div class="wizard-actions-row">
+              <button type="button" class="wizard-back-btn" id="btn-back-obstacle">← Back</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Pane Header (Starts hidden) -->
+        <div class="pane-header" id="chat-pane-header" style="display: none;">
           <div class="glitch-avatar">
             <img src="assets/logo.png" alt="Glitch Mascot" class="glitch-avatar-img">
           </div>
@@ -51,7 +238,7 @@
         </div>
 
         <!-- Chat messages view -->
-        <div class="chat-log" id="chat-log">
+        <div class="chat-log" id="chat-log" style="display: none;">
           <!-- Populated dynamically -->
         </div>
 
@@ -62,77 +249,85 @@
           <span class="dot"></span>
         </div>
 
-        <!-- Dynamic Interactive Selectors -->
+        <!-- Quick replies (Reused in iterative mode) -->
         <div class="quick-replies-container" id="quick-replies-container" style="display: none;"></div>
 
-        <div class="gesture-selector-panel" id="gesture-selector-panel" style="display: none;">
-          <h4>Map Tracking Gestures</h4>
-          <p>Select physical inputs to hook into your game loop:</p>
-          <div class="gesture-checklist">
-            <label><input type="checkbox" value="March in Place (Movement)"> March in Place (walk)</label>
-            <label><input type="checkbox" value="Lean Left/Right (Steering/Dodging)"> Lean Left/Right (dodge/slide)</label>
-            <label><input type="checkbox" value="Pinch Fingers (Action/Shoot/Draw)"> Pinch Fingers (action/shoot)</label>
-            <label><input type="checkbox" value="Open Hand/Palm (Erase/Interact)"> Open Hand/Palm (erase)</label>
-            <label><input type="checkbox" value="Open Mouth (Vertical Rise/Blow)"> Open Mouth (vertical rise/blow)</label>
-            <label><input type="checkbox" value="Voice Commands ('go', 'stop', 'reload')"> Voice Commands</label>
-          </div>
-          <div class="custom-gesture-row">
-            <input type="text" id="custom-gesture-input" placeholder="Or type custom gesture mapping...">
-          </div>
-          <button type="button" id="btn-confirm-gestures" class="action-btn confirm-gestures-btn">Confirm Selections</button>
-        </div>
-
-        <!-- Chat Input Section -->
-        <form id="chat-form" class="chat-form">
-          <input type="text" id="chat-input" placeholder="Describe your game idea to Glitch..." autocomplete="off" required>
+        <!-- Chat Input Section (Starts hidden) -->
+        <form id="chat-form" class="chat-form" style="display: none;">
+          <input type="text" id="chat-input" placeholder="Tweak your game code..." autocomplete="off" required>
           <button type="submit" class="send-btn" id="send-btn">Send</button>
         </form>
       </section>
 
-      <!-- Right Pane: Sandboxed Game Playtest / Telemetry -->
-      <section class="pane preview-pane">
-        <div class="pane-header">
-          <div class="preview-title">
-            <span class="badge">SANDBOX PREVIEW</span>
-            <h3 id="preview-game-name">No Game Generated Yet</h3>
+      <!-- Right Pane: Sandboxed Game Playtest / Telemetry / Plan Review -->
+      <section class="pane preview-pane" id="preview-pane">
+        <!-- Implementation Plan Review Mode Container -->
+        <div class="plan-container" id="plan-container" style="display: none;">
+          <div class="plan-header">
+            <span class="badge">SPECIFICATION STAGE</span>
+            <h3>PROPOSED IMPLEMENTATION PLAN</h3>
           </div>
-          <div class="preview-actions">
-            <button id="btn-run-agent" class="action-btn" disabled>🤖 Run Agent</button>
-            <button id="btn-toggle-camera" class="action-btn">Enable Camera</button>
-            <button id="btn-publish-game" class="action-btn publish-btn" disabled>Publish Game</button>
+          
+          <div class="plan-markdown-scroller" id="plan-markdown-container">
+            <div class="plan-loading">
+              <div class="spinner"></div>
+              <p>Analyzing game design specifications...</p>
+            </div>
+          </div>
+
+          <div class="plan-feedback-section" id="plan-feedback-section">
+            <textarea id="plan-feedback-input" placeholder="Suggest revisions or adjustments to this implementation plan..."></textarea>
+            <div class="plan-actions">
+              <button type="button" id="btn-suggest-changes" class="action-btn">Suggest Changes</button>
+              <button type="button" id="btn-proceed-build" class="action-btn publish-btn">Proceed & Build Game ⚡</button>
+            </div>
           </div>
         </div>
 
         <!-- The Sandbox Container -->
-        <div class="sandbox-container">
-          <!-- Instruction/Placeholder overlay -->
-          <div class="sandbox-placeholder" id="sandbox-placeholder">
-            <div class="placeholder-icon">🕹️</div>
-            <h2>Awaiting Code Compilation</h2>
-            <p>Answer Glitch's questions on the left. Once the specs are complete, your game will compile and load instantly in this interactive sandbox.</p>
+        <div class="sandbox-container" id="sandbox-container" style="display: none;">
+          <div class="pane-header" id="preview-pane-header">
+            <div class="preview-title">
+              <span class="badge">SANDBOX PREVIEW</span>
+              <h3 id="preview-game-name">No Game Generated Yet</h3>
+            </div>
+            <div class="preview-actions">
+              <button id="btn-run-agent" class="action-btn" disabled>🤖 Run Agent</button>
+              <button id="btn-toggle-camera" class="action-btn">Enable Camera</button>
+              <button id="btn-publish-game" class="action-btn publish-btn" disabled>Publish Game</button>
+            </div>
           </div>
 
-          <!-- Sandboxed Game Iframe -->
-          <iframe id="game-frame" class="game-frame" style="display: none;"></iframe>
-
-          <!-- Mini Camera overlay and telemetry panel -->
-          <div class="sensor-overlay" id="sensor-overlay" style="display: none;">
-            <div class="camera-wrapper">
-              <video id="webcam-view" autoplay muted playsinline></video>
+          <div class="sandbox-body" id="sandbox-body">
+            <!-- Instruction/Placeholder overlay -->
+            <div class="sandbox-placeholder" id="sandbox-placeholder">
+              <div class="placeholder-icon">🕹️</div>
+              <h2>Awaiting Code Compilation</h2>
+              <p>Answer Glitch's questions on the left. Once the specs are complete, your game will compile and load instantly in this interactive sandbox.</p>
             </div>
-            <div class="telemetry-panel">
-              <div class="telemetry-title">Gesture Telemetry</div>
-              <div class="telemetry-row"><span>Walking:</span><span id="tel-walk" class="tel-val val-false">FALSE</span></div>
-              <div class="telemetry-row"><span>Leaning:</span><span id="tel-lean" class="tel-val val-center">CENTER</span></div>
-              <div class="telemetry-row"><span>Pinch/Shoot:</span><span id="tel-shoot" class="tel-val val-false">FALSE</span></div>
-              <div class="telemetry-row"><span>Mouth Open:</span><span id="tel-mouth" class="tel-val val-false">FALSE</span></div>
-              <div class="telemetry-row"><span>Active Hands:</span><span id="tel-hands" class="tel-val val-none">0</span></div>
+
+            <!-- Sandboxed Game Iframe -->
+            <iframe id="game-frame" class="game-frame" style="display: none;"></iframe>
+
+            <!-- Mini Camera overlay and telemetry panel -->
+            <div class="sensor-overlay" id="sensor-overlay" style="display: none;">
+              <div class="camera-wrapper">
+                <video id="webcam-view" autoplay muted playsinline></video>
+              </div>
+              <div class="telemetry-panel">
+                <div class="telemetry-title">Gesture Telemetry</div>
+                <div class="telemetry-row"><span>Walking:</span><span id="tel-walk" class="tel-val val-false">FALSE</span></div>
+                <div class="telemetry-row"><span>Leaning:</span><span id="tel-lean" class="tel-val val-center">CENTER</span></div>
+                <div class="telemetry-row"><span>Pinch/Shoot:</span><span id="tel-shoot" class="tel-val val-false">FALSE</span></div>
+                <div class="telemetry-row"><span>Mouth Open:</span><span id="tel-mouth" class="tel-val val-false">FALSE</span></div>
+                <div class="telemetry-row"><span>Active Hands:</span><span id="tel-hands" class="tel-val val-none">0</span></div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Console / Status log under preview -->
-        <div class="console-log" id="console-log">
+        <div class="console-log" id="console-log" style="display: none;">
           <div class="console-line system">[System] Node ready. Awaiting design protocol initialization...</div>
         </div>
       </section>
