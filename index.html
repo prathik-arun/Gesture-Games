@@ -11,23 +11,9 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   
-  <!-- Developer Bypass Gate -->
+  <!-- Redirect immediately to Games Lobby for Production -->
   <script>
-    (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('clear') === 'true') {
-        localStorage.removeItem('preview_access');
-        // Clean URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else if (urlParams.get('preview') === 'gesture_dev') {
-        localStorage.setItem('preview_access', 'gesture_dev');
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-      
-      if (localStorage.getItem('preview_access') === 'gesture_dev') {
-        window.location.href = 'lobby.html';
-      }
-    })();
+    window.location.href = 'lobby.html';
   </script>
 
   <style>

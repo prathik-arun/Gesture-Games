@@ -13,19 +13,8 @@
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('preview') === 'gesture_dev') {
-        localStorage.setItem('preview_access', 'gesture_dev');
+        sessionStorage.setItem('preview_access', 'gesture_dev');
         window.history.replaceState({}, document.title, window.location.pathname);
-        return;
-      }
-      if (localStorage.getItem('preview_access') !== 'gesture_dev') {
-        document.documentElement.style.display = 'none';
-        const code = prompt("Enter developer passcode to access preview:");
-        if (code === 'gesture_dev') {
-          localStorage.setItem('preview_access', 'gesture_dev');
-          document.documentElement.style.display = '';
-        } else {
-          window.location.href = 'index.html';
-        }
       }
     })();
   </script>
@@ -91,33 +80,18 @@
     <div class="container">
       <h2 class="section-title">Games Lobby</h2>
       <div class="lobby-grid">
-        <!-- Glitch Game Creator (NEW AI Tool) -->
-        <div class="game-card theme-creator" style="border: 1px dashed var(--secondary-accent); background: rgba(0, 229, 255, 0.02);">
-          <div class="game-preview">
-            <span class="badge" style="background:#00e5ff; color:#000;">AI TOOL</span>
-            <div style="font-size: 5rem; text-align: center; padding: 20px 0;">⚡🤖</div>
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>AI Game Creator</h3>
-            <div class="game-meta">AI-Powered | Web Engine</div>
-            <p>Chat with <strong>Glitch</strong> to dynamically build your own custom gesture-controlled games in seconds using 3D Three.js or 2D canvas, playtest, and publish them!</p>
-            <a href="creator.html" class="btn" style="border-color:#00e5ff; color:#00e5ff;">Open Builder</a>
-          </div>
-        </div>
-
-        <!-- Dead Zone (LIVE) -->
-        <div class="game-card theme-deadzone">
+        <!-- Scream Detector (LIVE) -->
+        <div class="game-card theme-scream">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/dead_zone_thumb.png" alt="Dead Zone Cover" class="game-cover-art">
+            <img src="assets/thumbnails/scream_detector_thumb.png" alt="Scream Detector Cover" class="game-cover-art">
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
-            <h3>Dead Zone</h3>
-            <div class="game-meta">Zombie Survival | Action</div>
-            <p>Survive endless waves of the undead. Say "walk" or "go" to walk, "stop" to halt, lean left/right to strafe, and pinch your fingers to shoot.</p>
-            <a href="games/dead-zone/index.html" class="btn">Play Game</a>
+            <h3>Scream Detector</h3>
+            <div class="game-meta">Microphone & Camera | Interactive</div>
+            <p>Test your lungs! Scream as loud as you can while the camera captures your hilariously terrified expressions. Compare decibels and check out your top reaction shots!</p>
+            <a href="games/scream-detector/index.html" class="btn" style="border-color:#ff0055;">Play Game</a>
           </div>
         </div>
 
@@ -151,33 +125,33 @@
           </div>
         </div>
 
-        <!-- Scream Detector (LIVE) -->
-        <div class="game-card theme-scream">
+        <!-- Gesture Skribbl (LIVE) -->
+        <div class="game-card theme-skribbl">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/scream_detector_thumb.png" alt="Scream Detector Cover" class="game-cover-art">
+            <img src="assets/thumbnails/gesture_skribbl_thumb.png" alt="Gesture Skribbl Cover" class="game-cover-art">
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
-            <h3>Scream Detector</h3>
-            <div class="game-meta">Microphone & Camera | Interactive</div>
-            <p>Test your lungs! Scream as loud as you can while the camera captures your hilariously terrified expressions. Compare decibels and check out your top reaction shots!</p>
-            <a href="games/scream-detector/index.html" class="btn" style="border-color:#ff0055;">Play Game</a>
+            <h3>Gesture Skribbl</h3>
+            <div class="game-meta">Multiplayer | Gesture Drawing</div>
+            <p>Draw in the air to make your friends guess! Create a room, share the code, and use hand gestures (pinch to draw, open hand to erase) to score points.</p>
+            <a href="games/gesture-skribbl/index.html" class="btn" style="border-color:#ff00cc;">Play Game</a>
           </div>
         </div>
 
-        <!-- Gesture Snake (LIVE) -->
-        <div class="game-card theme-snake">
+        <!-- Gesture Charades (LIVE) -->
+        <div class="game-card theme-charades">
           <div class="game-preview">
             <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/gesture_snake_thumb.png" alt="Gesture Snake Cover" class="game-cover-art">
+            <img src="assets/thumbnails/gesture_charades_thumb.png" alt="Gesture Charades Cover" class="game-cover-art">
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
-            <h3>Gesture Snake</h3>
-            <div class="game-meta">Dual Inputs | Grid Arcade</div>
-            <p>Steer a cyber-snake in 4 directions by pointing your finger or calling out commands ("Up", "Down", "Left", "Right"). Dual controls combine for maximum agility!</p>
-            <a href="games/gesture-snake/index.html" class="btn" style="border-color:#00ff88;">Play Game</a>
+            <h3>Gesture Charades</h3>
+            <div class="game-meta">Multiplayer | Video Dumb Charades</div>
+            <p>Act out words in front of your camera for your friends to guess in real-time. Choose from standard categories or use AI to generate custom topics!</p>
+            <a href="games/gesture-charades/index.html" class="btn" style="border-color:#9d00ff;">Play Game</a>
           </div>
         </div>
 
@@ -211,51 +185,6 @@
           </div>
         </div>
 
-        <!-- Laser Pinch (LIVE) -->
-        <div class="game-card theme-laser">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/laser_pinch_thumb.png" alt="Laser Pinch Cover" class="game-cover-art">
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>Laser Pinch</h3>
-            <div class="game-meta">Aim & Shoot | Action</div>
-            <p>Aim a targeting reticle with your hand and pinch your fingers to fire laser beams! Protect your shields by zapping falling cyber-debris.</p>
-            <a href="games/laser-pinch/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Neon Keepy-Uppy (LIVE) -->
-        <div class="game-card theme-keepy">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/keepy_uppy_thumb.png" alt="Neon Keepy-Uppy Cover" class="game-cover-art">
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>Neon Keepy-Uppy</h3>
-            <div class="game-meta">Face & Hand Tracking | Physics</div>
-            <p>Keep the glowing neon balloons in the air! Bounce them off your hands and head, or open your mouth to blow a gust of wind to lift them up.</p>
-            <a href="games/keepy-uppy/index.html" class="btn" style="border-color:#ff00ff;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Cyber Strike 3D (LIVE) -->
-        <div class="game-card theme-strike">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/cyber_strike_3d_thumb.png" alt="Cyber Strike 3D Cover" class="game-cover-art">
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>Cyber Strike 3D</h3>
-            <div class="game-meta">3D WebGL | First-Person Shooter</div>
-            <p>Step into a virtual 3D arena controlled entirely by your body and voice. Aim with your hand, pinch to shoot, and walk in place to move!</p>
-            <a href="games/cyber-strike-3d/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
-          </div>
-        </div>
-
         <!-- Cyber Surfer (LIVE) -->
         <div class="game-card theme-surfer">
           <div class="game-preview">
@@ -271,12 +200,129 @@
           </div>
         </div>
 
-
-        <!-- Doors: The Castle (LIVE) -->
-        <div class="game-card theme-doors">
+        <!-- Glitch Game Creator (COMING SOON) -->
+        <div class="game-card theme-creator dev-only-game coming-soon" style="border: 1px dashed var(--secondary-accent); background: rgba(0, 229, 255, 0.02);">
           <div class="game-preview">
-            <span class="badge">LIVE</span>
+            <span class="badge" style="background:#00e5ff; color:#000;">AI TOOL</span>
+            <div style="font-size: 5rem; text-align: center; padding: 20px 0;">⚡🤖</div>
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>AI Game Creator</h3>
+            <div class="game-meta">AI-Powered | Web Engine</div>
+            <p>Chat with <strong>Glitch</strong> to dynamically build your own custom gesture-controlled games in seconds using 3D Three.js or 2D canvas, playtest, and publish them!</p>
+            <a href="creator.html" class="btn" style="border-color:#00e5ff; color:#00e5ff;">Open Builder</a>
+          </div>
+        </div>
+
+        <!-- Dead Zone (COMING SOON) -->
+        <div class="game-card theme-deadzone dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
+            <img src="assets/thumbnails/dead_zone_thumb.png" alt="Dead Zone Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>Dead Zone</h3>
+            <div class="game-meta">Zombie Survival | Action</div>
+            <p>Survive endless waves of the undead. Say "walk" or "go" to walk, "stop" to halt, lean left/right to strafe, and pinch your fingers to shoot.</p>
+            <a href="games/dead-zone/index.html" class="btn">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Gesture Snake (COMING SOON) -->
+        <div class="game-card theme-snake dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
+            <img src="assets/thumbnails/gesture_snake_thumb.png" alt="Gesture Snake Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>Gesture Snake</h3>
+            <div class="game-meta">Dual Inputs | Grid Arcade</div>
+            <p>Steer a cyber-snake in 4 directions by pointing your finger or calling out commands ("Up", "Down", "Left", "Right"). Dual controls combine for maximum agility!</p>
+            <a href="games/gesture-snake/index.html" class="btn" style="border-color:#00ff88;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Laser Pinch (COMING SOON) -->
+        <div class="game-card theme-laser dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
+            <img src="assets/thumbnails/laser_pinch_thumb.png" alt="Laser Pinch Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>Laser Pinch</h3>
+            <div class="game-meta">Aim & Shoot | Action</div>
+            <p>Aim a targeting reticle with your hand and pinch your fingers to fire laser beams! Protect your shields by zapping falling cyber-debris.</p>
+            <a href="games/laser-pinch/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Neon Keepy-Uppy (COMING SOON) -->
+        <div class="game-card theme-keepy dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
+            <img src="assets/thumbnails/keepy_uppy_thumb.png" alt="Neon Keepy-Uppy Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>Neon Keepy-Uppy</h3>
+            <div class="game-meta">Face & Hand Tracking | Physics</div>
+            <p>Keep the glowing neon balloons in the air! Bounce them off your hands and head, or open your mouth to blow a gust of wind to lift them up.</p>
+            <a href="games/keepy-uppy/index.html" class="btn" style="border-color:#ff00ff;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Cyber Strike 3D (COMING SOON) -->
+        <div class="game-card theme-strike dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
+            <img src="assets/thumbnails/cyber_strike_3d_thumb.png" alt="Cyber Strike 3D Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
+            <div class="game-glass-overlay"></div>
+          </div>
+          <div class="game-content">
+            <h3>Cyber Strike 3D</h3>
+            <div class="game-meta">3D WebGL | First-Person Shooter</div>
+            <p>Step into a virtual 3D arena controlled entirely by your body and voice. Aim with your hand, pinch to shoot, and walk in place to move!</p>
+            <a href="games/cyber-strike-3d/index.html" class="btn" style="border-color:#00e5ff;">Play Game</a>
+          </div>
+        </div>
+
+        <!-- Doors: The Castle (COMING SOON) -->
+        <div class="game-card theme-doors dev-only-game coming-soon">
+          <div class="game-preview">
+            <span class="badge">COMING SOON</span>
             <img src="assets/thumbnails/doors_castle_thumb.png" alt="Doors: The Castle Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
@@ -287,11 +333,15 @@
           </div>
         </div>
 
-        <!-- Shadow Fighter (LIVE) -->
-        <div class="game-card theme-shadow">
+        <!-- Shadow Fighter (COMING SOON) -->
+        <div class="game-card theme-shadow dev-only-game coming-soon">
           <div class="game-preview">
-            <span class="badge">LIVE</span>
+            <span class="badge">COMING SOON</span>
             <img src="assets/thumbnails/shadow_fighter_thumb.png" alt="Shadow Fighter Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
@@ -302,41 +352,15 @@
           </div>
         </div>
 
-        <!-- Gesture Skribbl (LIVE) -->
-        <div class="game-card theme-skribbl">
+        <!-- Rhythm Saber (COMING SOON) -->
+        <div class="game-card theme-saber dev-only-game coming-soon">
           <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/gesture_skribbl_thumb.png" alt="Gesture Skribbl Cover" class="game-cover-art">
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>Gesture Skribbl</h3>
-            <div class="game-meta">Multiplayer | Gesture Drawing</div>
-            <p>Draw in the air to make your friends guess! Create a room, share the code, and use hand gestures (pinch to draw, open hand to erase) to score points.</p>
-            <a href="games/gesture-skribbl/index.html" class="btn" style="border-color:#ff00cc;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Gesture Charades (LIVE) -->
-        <div class="game-card theme-charades">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
-            <img src="assets/thumbnails/gesture_charades_thumb.png" alt="Gesture Charades Cover" class="game-cover-art">
-            <div class="game-glass-overlay"></div>
-          </div>
-          <div class="game-content">
-            <h3>Gesture Charades</h3>
-            <div class="game-meta">Multiplayer | Video Dumb Charades</div>
-            <p>Act out words in front of your camera for your friends to guess in real-time. Choose from standard categories or use AI to generate custom topics!</p>
-            <a href="games/gesture-charades/index.html" class="btn" style="border-color:#9d00ff;">Play Game</a>
-          </div>
-        </div>
-
-        <!-- Rhythm Saber (LIVE) -->
-        <div class="game-card theme-saber">
-          <div class="game-preview">
-            <span class="badge">LIVE</span>
+            <span class="badge">COMING SOON</span>
             <img src="assets/thumbnails/rhythm_saber_thumb.png" alt="Rhythm Saber Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
@@ -347,11 +371,15 @@
           </div>
         </div>
 
-        <!-- Gesture Luffy (LIVE) -->
-        <div class="game-card theme-luffy">
+        <!-- Gesture Luffy (COMING SOON) -->
+        <div class="game-card theme-luffy dev-only-game coming-soon">
           <div class="game-preview">
-            <span class="badge">LIVE</span>
+            <span class="badge">COMING SOON</span>
             <img src="assets/thumbnails/gesture_luffy_thumb.png" alt="Gesture Luffy Cover" class="game-cover-art">
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Coming Soon</div>
+            </div>
             <div class="game-glass-overlay"></div>
           </div>
           <div class="game-content">
@@ -361,6 +389,20 @@
             <a href="games/gesture-luffy/index.html" class="btn" style="border-color:#ff3b30;">Play Game</a>
           </div>
         </div>
+      </div>
+  </section>
+
+  <!-- Developer Unlock Panel -->
+  <section class="developer-panel">
+    <div class="container">
+      <div class="dev-card">
+        <h3>Developer Access</h3>
+        <p>Enter the decryption passcode to unlock beta levels, experimental features, and unreleased games.</p>
+        <div class="dev-input-group">
+          <input type="password" id="dev-passcode" placeholder="Enter passcode...">
+          <button id="btn-unlock-dev" class="btn">Decrypt</button>
+        </div>
+        <div id="dev-message" class="dev-msg"></div>
       </div>
     </div>
   </section>
@@ -858,6 +900,138 @@
       }
 
       animate();
+    })();
+  </script>
+
+  <!-- Developer Passcode Decryptor Script -->
+  <script>
+    (function() {
+      // Passcode functionality
+      const devPasscodeInput = document.getElementById('dev-passcode');
+      const devUnlockBtn = document.getElementById('btn-unlock-dev');
+      const devMessage = document.getElementById('dev-message');
+      const devCard = document.querySelector('.dev-card');
+
+      function updateLobbyLockState() {
+        const isUnlocked = sessionStorage.getItem('preview_access') === 'gesture_dev';
+        const devOnlyCards = document.querySelectorAll('.dev-only-game');
+        
+        if (isUnlocked) {
+          devOnlyCards.forEach(card => {
+            card.classList.remove('coming-soon');
+            const badge = card.querySelector('.badge');
+            if (badge && (badge.textContent === 'COMING SOON' || badge.textContent === 'AI TOOL')) {
+              if (badge.textContent === 'COMING SOON') {
+                badge.textContent = 'BETA';
+                badge.style.background = '#2ecc71';
+                badge.style.color = '#fff';
+              }
+            }
+            // Enable pointer events on child buttons
+            const playBtn = card.querySelector('a.btn');
+            if (playBtn) {
+              playBtn.style.pointerEvents = 'auto';
+              playBtn.style.cursor = 'pointer';
+            }
+          });
+          
+          // Update dev card content to show active mode
+          if (devCard) {
+            devCard.innerHTML = `
+              <h3>Developer Access Active</h3>
+              <p>You have unlocked all beta and experimental gesture games. Enjoy testing!</p>
+              <div style="display:flex; justify-content:center; gap:12px; align-items:center;">
+                <div class="dev-active-banner">
+                  <span>🟢 DEVELOPER MODE ACTIVE</span>
+                </div>
+                <button id="btn-lock-dev" class="btn" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#aaa; padding:8px 16px; border-radius:6px; font-family:'Orbitron', sans-serif; cursor:pointer; font-size:0.8rem; transition: all 0.3s ease;">Lock Games</button>
+              </div>
+            `;
+            
+            // Add hover glow to Lock Games button
+            const lockBtn = document.getElementById('btn-lock-dev');
+            lockBtn.addEventListener('mouseenter', () => {
+              lockBtn.style.borderColor = '#e74c3c';
+              lockBtn.style.color = '#e74c3c';
+              lockBtn.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.2)';
+            });
+            lockBtn.addEventListener('mouseleave', () => {
+              lockBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+              lockBtn.style.color = '#aaa';
+              lockBtn.style.boxShadow = 'none';
+            });
+            
+            lockBtn.addEventListener('click', () => {
+              sessionStorage.removeItem('preview_access');
+              window.location.reload();
+            });
+          }
+        } else {
+          devOnlyCards.forEach(card => {
+            card.classList.add('coming-soon');
+            // Disable pointer events on child buttons
+            const playBtn = card.querySelector('a.btn');
+            if (playBtn) {
+              playBtn.style.pointerEvents = 'none';
+              playBtn.style.cursor = 'not-allowed';
+            }
+          });
+        }
+      }
+
+      // Run on load
+      updateLobbyLockState();
+
+      // Event listener for unlock button
+      if (devUnlockBtn && devPasscodeInput) {
+        const handleUnlock = () => {
+          const code = devPasscodeInput.value.trim();
+          if (code === 'gesture_dev') {
+            sessionStorage.setItem('preview_access', 'gesture_dev');
+            devMessage.textContent = "⚡ PASSCODE DECRYPTED. UNLOCKING ALL BETA LEVEL CONFIGURATIONS... ⚡";
+            devMessage.className = "dev-msg success";
+            
+            // Smoothly reload page or update state after unlock sequence
+            setTimeout(() => {
+              updateLobbyLockState();
+              const lobbySection = document.getElementById('lobby');
+              if (lobbySection) {
+                lobbySection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }, 1200);
+          } else {
+            devMessage.textContent = "✖ ACCESS DENIED. INVALID DECRYPTION PASSCODE. ✖";
+            devMessage.className = "dev-msg error";
+            
+            setTimeout(() => {
+              devMessage.textContent = "";
+            }, 3000);
+          }
+        };
+
+        devUnlockBtn.addEventListener('click', handleUnlock);
+        devPasscodeInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            handleUnlock();
+          }
+        });
+      }
+
+      // Add click handler for locked games to shake them
+      document.addEventListener('click', (e) => {
+        const card = e.target.closest('.game-card.coming-soon');
+        if (card) {
+          // Prevent default click actions
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Trigger shake animation
+          card.classList.add('shake');
+          setTimeout(() => {
+            card.classList.remove('shake');
+          }, 400);
+        }
+      }, true); // Capture phase execution
     })();
   </script>
 </body>
